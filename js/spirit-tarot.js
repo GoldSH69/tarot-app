@@ -1,149 +1,81 @@
-/**
- * 영타로 (Spirit Tarot) 모듈
- * 명상 → 셔플 → 직관적 선택
- */
+// ========================================
+// spirit-tarot.js - 영타로 모듈
+// ========================================
 
-let spiritTimerInterval = null;
-let spiritDeckCards = [];
-let spiritSelectedCards = [];
-let spiritJumpCardTriggered = false;
+let spiritState = {
+  phase: 'intro',     // intro, meditate, shuffle, select, result
+  deck: [],
+  selected: [],
+  timer: null,
+  meditationTime: 15
+};
 
 function startSpiritTarot() {
-  document.getElementById('spread-selection').classList.add('hidden');
-  document.getElementById('three-card-options').classList.add('hidden');
-  document.getElementById('spirit-tarot-area').classList.remove('hidden');
+  const container = document.getElementById('reading-container');
+  spiritState = {
+    phase: 'intro',
+    deck: [],
+    selected: [],
+    timer: null,
+    meditationTime: 15
+  };
 
-  spiritSelectedCards = [];
-  spiritJumpCardTriggered = false;
-  spiritDeckCards = shuffleArray(getAllCards());
+  container.innerHTML = `
+    <div class="spirit-tarot-section">
+      <h2>👁️ 영타로 리딩</h2>
 
-  // 질문 입력 (간단하게)
-  currentQuestion = prompt('마음속 질문을 떠올려보세요.\n질문을 입력하세요 (선택사항):', '') || '';
+      <!-- 가이드 설명 -->
+      <div class="spirit-guide" id="spirit-guide">
+        <div class="spirit-guide-box">
+          <h3>🌟 영타로란?</h3>
+          <div class="spirit-guide-content">
+            <p>영타로(Spirit Tarot)는 <strong>직관과 영감</strong>을 활용하는 특별한 리딩 방법입니다.</p>
 
-  startMeditationTimer();
-}
+            <h4>📋 진행 방법</h4>
+            <ol>
+              <li><strong>명상 (15초)</strong> - 마음을 가라앉히고 질문에 집중합니다</li>
+              <li><strong>셔플</strong> - 카드가 자동으로 섞이는 것을 바라봅니다</li>
+              <li><strong>카드 선택</strong> - "느낌이 올 때" 화면을 터치합니다</li>
+              <li><strong>총 3장</strong>을 직감으로 선택합니다</li>
+            </ol>
 
-// ============================================
-// 명상 타이머
-// ============================================
-function startMeditationTimer() {
-  const timerEl = document.getElementById('spirit-timer');
-  const countEl = document.getElementById('timer-count');
-  const shuffleArea = document.getElementById('spirit-shuffle');
+            <h4>💡 핵심 포인트</h4>
+            <ul>
+              <li>머리로 고르지 말고, <strong>끌리는 느낌</strong>에 따르세요</li>
+              <li>셔플 중 카드가 <strong>튀어나오면 (점프카드)</strong> 자동으로 선택됩니다</li>
+              <li>점프카드는 영적 메시지가 강한 카드입니다</li>
+              <li>편안한 마음으로 카드와 교감한다고 생각하세요</li>
+            </ul>
 
-  timerEl.classList.remove('hidden');
-  shuffleArea.classList.add('hidden');
+            <h4>🎯 이런 질문에 적합해요</h4>
+            <p>"내가 알아야 할 것은?", "영적으로 전하고 싶은 메시지는?", "숨겨진 진실은?"</p>
+          </div>
+        </div>
 
-  let seconds = 15; // 15초 명상
-  countEl.textContent = seconds;
+        <div class="form-group" style="margin-top: 16px;">
+          <textarea id="spirit-question" rows="2" placeholder="질문을 마음에 품어보세요 (선택사항)"></textarea>
+        </div>
 
-  spiritTimerInterval = setInterval(() => {
-    seconds--;
-    countEl.textContent = seconds;
-
-    if (seconds <= 0) {
-      clearInterval(spiritTimerInterval);
-      timerEl.classList.add('hidden');
-      startSpiritShuffle();
-    }
-  }, 1000);
-}
-
-// ============================================
-// 영적 셔플
-// ============================================
-function startSpiritShuffle() {
-  const shuffleArea = document.getElementById('spirit-shuffle');
-  shuffleArea.classList.remove('hidden');
-
-  // 점프카드 랜덤 트리거 (20% 확률)
-  if (Math.random() < 0.2 && spiritSelectedCards.length === 0) {
-    setTimeout(() => {
-      spiritJumpCardTriggered = true;
-      const jumpNotice = document.getElementById('spirit-jump-card');
-      jumpNotice.classList.remove('hidden');
-
-      // 점프카드 자동 선택
-      const jumpCard = spiritDeckCards[Math.floor(Math.random() * spiritDeckCards.length)];
-      const reversed = Math.random() < 0.3;
-      spiritSelectedCards.push({ ...jumpCard, reversed, isJumpCard: true });
-      renderSpiritSelectedCards();
-    }, Math.random() * 3000 + 2000);
-  }
-
-  updateSpiritInstruction();
-}
-
-// ============================================
-// 카드 선택 (느낌이 올 때 탭)
-// ============================================
-function spiritDrawCard() {
-  const totalNeeded = 3;
-  const remaining = totalNeeded - spiritSelectedCards.filter(c => !c.isJumpCard).length;
-
-  if (remaining <= 0) return;
-
-  // 이미 선택된 카드 제외
-  const selectedIds = spiritSelectedCards.map(c => c.id);
-  const available = spiritDeckCards.filter(c => !selectedIds.includes(c.id));
-
-  if (available.length === 0) return;
-
-  const card = available[Math.floor(Math.random() * available.length)];
-  const reversed = Math.random() < 0.3;
-
-  spiritSelectedCards.push({ ...card, reversed, isJumpCard: false });
-  renderSpiritSelectedCards();
-  updateSpiritInstruction();
-
-  // 덱 다시 섞기 효과
-  spiritDeckCards = shuffleArray(spiritDeckCards);
-
-  const normalCards = spiritSelectedCards.filter(c => !c.isJumpCard);
-  if (normalCards.length >= totalNeeded) {
-    // 모든 카드 선택 완료
-    setTimeout(() => {
-      selectedReadingCards = [...spiritSelectedCards];
-      showReadingResult();
-    }, 1000);
-  }
-}
-
-function updateSpiritInstruction() {
-  const normalCards = spiritSelectedCards.filter(c => !c.isJumpCard);
-  const remaining = 3 - normalCards.length;
-
-  const btn = document.querySelector('.spirit-draw-btn');
-  if (btn) {
-    if (remaining > 0) {
-      btn.textContent = `✨ 카드를 선택합니다 (${remaining}장 남음) ✨`;
-      btn.disabled = false;
-    } else {
-      btn.textContent = '✨ 리딩 준비 완료 ✨';
-      btn.disabled = true;
-    }
-  }
-}
-
-function renderSpiritSelectedCards() {
-  const area = document.getElementById('spirit-selected-cards');
-  const labels = spiritSelectedCards.map((card, i) => {
-    if (card.isJumpCard) return '🌟 점프카드';
-    const normalIndex = spiritSelectedCards.slice(0, i + 1).filter(c => !c.isJumpCard).length;
-    return `영적 메시지 ${normalIndex}`;
-  });
-
-  area.innerHTML = spiritSelectedCards.map((card, i) => {
-    const imgClass = card.reversed ? 'reversed' : '';
-    const direction = card.reversed ? '역방향' : '정방향';
-    return `
-      <div class="selected-card-slot">
-        <div class="card-position-label">${labels[i]}</div>
-        <img src="${getCardImageUrl(card)}" alt="${card.name}" class="${imgClass}"
-             onerror="this.src='${createCardPlaceholder(card)}'">
-        <div class="card-name-label">${card.name}</div>
-        <div class="card-direction">${direction}</div>
+        <button class="btn-primary btn-lg btn-full" onclick="startMeditation()">🧘 명상 시작하기</button>
       </div>
-    `;
-  }).join('');
-}
+
+      <!-- 명상 단계 -->
+      <div id="spirit-meditate" style="display:none;">
+        <div class="meditation-box">
+          <div class="meditation-circle" id="meditation-circle">
+            <span class="meditation-timer" id="meditation-timer">${spiritState.meditationTime}</span>
+          </div>
+          <p class="meditation-text">눈을 감고 깊게 호흡하세요...</p>
+          <p class="meditation-sub">질문을 마음속으로 떠올리세요</p>
+        </div>
+      </div>
+
+      <!-- 셔플 & 카드 선택 -->
+      <div id="spirit-shuffle" style="display:none;">
+        <div class="shuffle-area">
+          <p class="shuffle-instruction" id="shuffle-instruction">카드가 섞이고 있습니다...</p>
+          <p class="shuffle-sub" id="shuffle-sub">느낌이 올 때 아래 카드를 탭하세요</p>
+          <div class="shuffle-deck" id="shuffle-deck">
+            <div class="shuffle-card-stack" onclick="spiritSelectCard()">
+              <div class="shuffle-card sc-1">🂠</div>
+              <div class="shuffle-card sc-
