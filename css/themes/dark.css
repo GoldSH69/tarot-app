@@ -1,0 +1,16 @@
+/* 다크 테마 (v1.5 예약, 기본 구조만) */
+:root {
+  --bg-color: #1e1e1e;
+  --card-bg: #2d2d2d;
+  --header-bg: rgba(30,30,30,0.95);
+  --text-color: #e0e0e0;
+  --text-light: #888;
+  --primary-color: #bb86fc;
+  --primary-hover: #9c64e8;
+  --sub-color: #6200ee;
+  --border-color: #404040;
+  --hover-bg: #383838;
+  --shadow-color: rgba(187, 134, 252, 0.15);
+  --font-family: '맑은 고딕', 'Malgun Gothic', sans-serif;
+  --font-size: 14px;
+}
