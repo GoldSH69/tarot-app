@@ -47,9 +47,15 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.admin-tabs .tab-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.admin-tab-content').forEach(c => {
+        c.classList.remove('active');
+        c.classList.add('hidden');
+      });
       const target = document.getElementById(`admin-tab-${btn.dataset.adminTab}`);
-      if (target) target.classList.add('active');
+      if (target) {
+        target.classList.remove('hidden');
+        target.classList.add('active');
+      }
     });
   });
 });
