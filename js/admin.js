@@ -5,6 +5,28 @@
 let adminPassword = '';
 
 // ============================================
+// 페이지 로드 시 세션 복원
+// ============================================
+(function restoreAdminSession() {
+  const saved = sessionStorage.getItem('tarot-admin-pw');
+  if (saved) {
+    adminPassword = saved;
+    // DOM 로드 후 자동 로그인 처리
+    document.addEventListener('DOMContentLoaded', function() {
+      const loginSection = document.getElementById('admin-login');
+      const dashboard = document.getElementById('admin-dashboard');
+      if (loginSection && dashboard) {
+        loginSection.classList.remove('active');
+        loginSection.classList.add('hidden');
+        dashboard.classList.remove('hidden');
+        dashboard.classList.add('active');
+        initAdminDashboard();
+      }
+    });
+  }
+})();
+
+// ============================================
 // 관리자 로그인
 // ============================================
 async function adminLogin() {
@@ -32,6 +54,9 @@ async function adminLogin() {
 
     if (data.success) {
       adminPassword = password;
+      // 세션에 저장 (탭이 열려있는 동안 유지)
+      sessionStorage.setItem('tarot-admin-pw', password);
+
       document.getElementById('admin-login').classList.remove('active');
       document.getElementById('admin-login').classList.add('hidden');
       document.getElementById('admin-dashboard').classList.remove('hidden');
@@ -49,6 +74,20 @@ async function adminLogin() {
     errorText.textContent = `서버 연결 실패: ${err.message}`;
     errorText.classList.remove('hidden');
   }
+}
+
+// ============================================
+// 관리자 로그아웃
+// ============================================
+function adminLogout() {
+  adminPassword = '';
+  sessionStorage.removeItem('tarot-admin-pw');
+  document.getElementById('admin-dashboard').classList.remove('active');
+  document.getElementById('admin-dashboard').classList.add('hidden');
+  document.getElementById('admin-login').classList.remove('hidden');
+  document.getElementById('admin-login').classList.add('active');
+  document.getElementById('admin-password').value = '';
+  showToast('로그아웃 되었습니다', 'info');
 }
 
 // ============================================
@@ -71,7 +110,7 @@ function loadSavedGistId() {
 }
 
 // ============================================
-// 의뢰 목록 불러오기 (수정: 정상 작동하도록)
+// 의뢰 목록 불러오기
 // ============================================
 function loadRequestList() {
   const container = document.getElementById('request-list');
@@ -102,7 +141,7 @@ function loadRequestList() {
     html += '  <div style="margin:0.5rem 0;"><strong>📧 이메일:</strong> ' + (req.email || '없음') + '</div>';
     html += '  <div style="margin:0.5rem 0;"><strong>❓ 질문:</strong> ' + (req.question || '없음') + '</div>';
     html += '  <div style="margin:0.5rem 0;"><strong>🃏 스프레드:</strong> ' + (req.spread || '전문가 추천') + '</div>';
-    
+
     // 프롬프트 영역
     html += '  <div id="prompt-area-' + req.id + '" class="hidden" style="margin:0.75rem 0;">';
     html += '    <textarea id="prompt-text-' + req.id + '" class="prompt-textarea" rows="12"></textarea>';
@@ -112,7 +151,7 @@ function loadRequestList() {
     html += '    </div>';
     html += '    <div id="ai-result-' + req.id + '" class="hidden" style="margin-top:0.75rem;"></div>';
     html += '  </div>';
-    
+
     html += '  <div class="journal-actions">';
     html += '    <button class="btn btn-primary btn-sm" onclick="generateRequestPrompt(' + req.id + ')">📝 프롬프트 생성</button>';
     if (req.status !== 'done') {
@@ -126,31 +165,9 @@ function loadRequestList() {
   container.innerHTML = html;
 }
 
-  container.innerHTML = requests.map(req => {
-    const statusText = req.status === 'done' ? '✅ 완료' : '⏳ 대기';
-    const statusClass = req.status === 'done' ? 'done' : 'pending';
-    return `
-      <div class="journal-entry">
-        <div class="journal-date">${formatDate(req.date)}</div>
-        <span class="journal-spread">${statusText}</span>
-        <div style="margin: 0.5rem 0;">
-          <strong>📧 이메일:</strong> ${req.email || '없음'}
-        </div>
-        <div style="margin: 0.5rem 0;">
-          <strong>❓ 질문:</strong> ${req.question || '없음'}
-        </div>
-        <div style="margin: 0.5rem 0;">
-          <strong>🃏 스프레드:</strong> ${req.spread || '전문가 추천'}
-        </div>
-        <div class="journal-actions">
-          ${req.status !== 'done' ? `<button class="btn btn-primary btn-sm" onclick="markRequestDone(${req.id})">✅ 완료 처리</button>` : ''}
-          <button class="btn btn-secondary btn-sm" onclick="deleteRequest(${req.id})">🗑️ 삭제</button>
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
+// ============================================
+// 의뢰 상태 변경 / 삭제
+// ============================================
 function markRequestDone(requestId) {
   const requests = JSON.parse(localStorage.getItem('tarot-requests') || '[]');
   const req = requests.find(r => r.id === requestId);
@@ -179,7 +196,6 @@ async function generateNewHash() {
   const newPw = document.getElementById('new-password').value;
   const confirmPw = document.getElementById('new-password-confirm').value;
 
-  // 현재 비밀번호 확인
   if (!currentPw) {
     showToast('현재 비밀번호를 입력하세요', 'error');
     return;
@@ -190,7 +206,6 @@ async function generateNewHash() {
     return;
   }
 
-  // 새 비밀번호 확인
   if (!newPw) {
     showToast('새 비밀번호를 입력하세요', 'error');
     return;
@@ -206,7 +221,6 @@ async function generateNewHash() {
     return;
   }
 
-  // SHA-256 해시 생성
   const hash = await sha256(newPw);
 
   const resultDiv = document.getElementById('hash-result');
@@ -330,8 +344,8 @@ function generateRequestPrompt(requestId) {
       positionLabels = ['상황', '장애물', '조언'];
     }
   } else if (cardCount === 10) {
-    positionLabels = ['현재 상황', '도전/장애물', '의식적 목표', '무의식적 기반', 
-                      '과거', '가까운 미래', '자기 자신', '주변 환경', 
+    positionLabels = ['현재 상황', '도전/장애물', '의식적 목표', '무의식적 기반',
+                      '과거', '가까운 미래', '자기 자신', '주변 환경',
                       '희망과 두려움', '최종 결과'];
   }
 
@@ -378,8 +392,8 @@ function generateRequestPrompt(requestId) {
   if (promptArea && promptText) {
     promptText.value = prompt;
     promptArea.classList.remove('hidden');
-    
-    // 뽑힌 카드 정보를 의뢰에 저장 (나중에 참조용)
+
+    // 뽑힌 카드 정보를 의뢰에 저장
     const allRequests = JSON.parse(localStorage.getItem('tarot-requests') || '[]');
     const targetReq = allRequests.find(function(r) { return r.id === requestId; });
     if (targetReq) {
@@ -414,7 +428,7 @@ function copyRequestPrompt(requestId) {
 async function executeRequestAI(requestId) {
   const promptText = document.getElementById('prompt-text-' + requestId);
   const resultArea = document.getElementById('ai-result-' + requestId);
-  
+
   if (!promptText || !promptText.value.trim()) {
     showToast('프롬프트가 비어있습니다', 'error');
     return;
@@ -463,7 +477,6 @@ async function executeRequestAI(requestId) {
 
       showToast('AI 분석이 완료되었습니다!', 'success');
     } else {
-      hideLoading();
       showToast('분석 실패: ' + (data.error || '알 수 없는 오류'), 'error');
     }
   } catch (err) {
@@ -494,13 +507,13 @@ function copyRequestResult(requestId) {
 }
 
 // ============================================
-// 이메일용 복사 (의뢰인 정보 + 결과)
+// 이메일용 복사
 // ============================================
 function copyResultAsEmail(requestId) {
   const requests = JSON.parse(localStorage.getItem('tarot-requests') || '[]');
   const req = requests.find(function(r) { return r.id === requestId; });
   const resultEl = document.getElementById('ai-result-text-' + requestId);
-  
+
   if (!req || !resultEl) {
     showToast('데이터를 찾을 수 없습니다', 'error');
     return;
