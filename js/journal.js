@@ -24,7 +24,7 @@ function renderJournalList() {
 
   container.innerHTML = entries.map(entry => {
     const cards = entry.cards.map(c => {
-      const dir = c.reversed ? '역' : '정';
+      const dir = (c.isReversed || c.reversed) ? '역' : '정';
       return `<span class="journal-card-badge">${c.name} (${dir})</span>`;
     }).join('');
 
