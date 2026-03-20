@@ -88,53 +88,51 @@ function showAIPromptStep() {
 }
 
 function buildPromptFromCurrentReading() {
-  // selectedReadingCards, currentSpreadType, currentQuestion은
-  // reading.js / spirit-tarot.js에서 전역으로 설정됨
+  var cards = selectedReadingCards || [];
+  var spreadType = currentSpreadType || 'one-card';
+  var question = currentQuestion || '';
 
-  const cards = selectedReadingCards || [];
-  const spreadType = currentSpreadType || 'one-card';
-  const question = currentQuestion || '';
+  var positionLabels = getPositionLabels(spreadType);
 
-  let positionLabels = getPositionLabels(spreadType);
+  var cardDetails = '';
+  var cardKeywords = '';
 
-  const cardDetails = cards.map((card, i) => {
-    const direction = card.reversed ? '역방향' : '정방향';
-    const label = card.isJumpCard ? '🌟 점프카드' : (positionLabels[i] || `카드 ${i + 1}`);
-    return `[${label}] ${card.name} (${card.nameEn}) — ${direction}`;
-  }).join('\n');
+  for (var i = 0; i < cards.length; i++) {
+    var card = cards[i];
+    var isRev = card.isReversed;
+    var direction = isRev ? '역방향' : '정방향';
+    var label = card.isJumpCard ? '🌟 점프카드' : (positionLabels[i] || '카드 ' + (i + 1));
 
-  // 카드별 기본 키워드 포함
-  const cardKeywords = cards.map((card, i) => {
-    const meaning = card.reversed ? card.reversed : card.upright;
-    const direction = card.reversed ? '역방향' : '정방향';
-    const kw = meaning && meaning.keywords ? meaning.keywords.join(', ') : '';
-    return `  ${card.name}(${direction}): ${kw}`;
-  }).join('\n');
+    cardDetails += '[' + label + '] ' + card.name + ' (' + (card.nameEn || '') + ') — ' + direction + '\n';
 
-  return `당신은 20년 이상의 경력을 가진 전문 타로 리더입니다.
-따뜻하고 통찰력 있는 해석을 제공해 주세요.
+    // 키워드 가져오기
+    var meaning = isRev ? card.reversedData : card.uprightData;
+    if (!meaning || !meaning.keywords) {
+      var orig = findCardById(card.id);
+      if (orig) meaning = isRev ? orig.reversed : orig.upright;
+    }
+    var kw = (meaning && meaning.keywords) ? meaning.keywords.join(', ') : '';
+    cardKeywords += '  ' + card.name + '(' + direction + '): ' + kw + '\n';
+  }
 
-=== 질문 ===
-${question || '오늘의 운세/메시지를 알고 싶습니다.'}
-
-=== 스프레드 유형 ===
-${getSpreadName(spreadType)}
-
-=== 선택된 카드 ===
-${cardDetails}
-
-=== 카드 키워드 참고 ===
-${cardKeywords}
-
-=== 분석 요청 ===
-1. 각 카드의 위치별 의미를 해석해 주세요.
-2. 카드들 간의 관계와 전체적인 흐름을 설명해 주세요.
-3. 질문에 대한 구체적인 조언을 제공해 주세요.
-4. 긍정적이고 건설적인 마무리 메시지를 포함해 주세요.
-
-한국어로 작성하고, 마크다운 형식(##, **, - 등)을 사용해 주세요.
-"AI"나 "인공지능"이라는 단어는 절대 사용하지 마세요.
-전문 타로 리더의 관점에서 자연스럽게 해석해 주세요.`;
+  return '당신은 20년 이상의 경력을 가진 전문 타로 리더입니다.\n' +
+    '따뜻하고 통찰력 있는 해석을 제공해 주세요.\n\n' +
+    '=== 질문 ===\n' +
+    (question || '오늘의 운세/메시지를 알고 싶습니다.') + '\n\n' +
+    '=== 스프레드 유형 ===\n' +
+    getSpreadName(spreadType) + '\n\n' +
+    '=== 선택된 카드 ===\n' +
+    cardDetails + '\n' +
+    '=== 카드 키워드 참고 ===\n' +
+    cardKeywords + '\n' +
+    '=== 분석 요청 ===\n' +
+    '1. 각 카드의 위치별 의미를 해석해 주세요.\n' +
+    '2. 카드들 간의 관계와 전체적인 흐름을 설명해 주세요.\n' +
+    '3. 질문에 대한 구체적인 조언을 제공해 주세요.\n' +
+    '4. 긍정적이고 건설적인 마무리 메시지를 포함해 주세요.\n\n' +
+    '한국어로 작성하고, 마크다운 형식(##, **, - 등)을 사용해 주세요.\n' +
+    '"AI"나 "인공지능"이라는 단어는 절대 사용하지 마세요.\n' +
+    '전문 타로 리더의 관점에서 자연스럽게 해석해 주세요.';
 }
 
 // ============================================
