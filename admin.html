@@ -3,120 +3,116 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>타로 - 관리자</title>
+  <title>타로 앱 - 관리자</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/themes/default.css" id="theme-link">
+  <link rel="stylesheet" href="css/themes/default.css" id="theme-stylesheet">
 </head>
 <body>
-  <header id="app-header">
+  <header class="app-header">
     <div class="header-inner">
-      <h1 class="logo">🔮 타로 관리자</h1>
-      <div class="header-actions">
-        <a href="index.html" class="btn btn-secondary btn-sm">사용자 페이지</a>
-        <button id="theme-toggle" onclick="cycleTheme()" title="테마 변경">🎨</button>
+      <h1 class="logo">⚙️ 관리자 페이지</h1>
+      <div class="header-right">
+        <a href="index.html" class="btn-back-link">🏠 메인으로</a>
       </div>
     </div>
   </header>
 
-  <main id="app-main">
+  <main class="main-content">
     <!-- 로그인 -->
-    <section id="admin-login" class="page active">
+    <section id="admin-login-section">
       <div class="admin-login-box">
-        <h2>🔐 관리자 인증</h2>
+        <h2>🔐 관리자 로그인</h2>
         <div class="form-group">
-          <input type="password" id="admin-password" placeholder="관리자 비밀번호" 
-                 onkeypress="if(event.key==='Enter') adminLogin()">
+          <input type="password" id="admin-password" placeholder="관리자 비밀번호" onkeydown="if(event.key==='Enter')adminLogin()">
         </div>
-        <button class="btn btn-primary btn-lg" onclick="adminLogin()">로그인</button>
-        <p id="admin-login-error" class="error-text hidden"></p>
+        <button class="btn-primary btn-full" onclick="adminLogin()">로그인</button>
       </div>
     </section>
 
-    <!-- 관리자 대시보드 -->
-    <section id="admin-dashboard" class="page hidden">
-      <div class="admin-tabs">
-        <button class="tab-btn active" data-admin-tab="analyze">🤖 AI 분석</button>
-        <button class="tab-btn" data-admin-tab="journal-sync">📋 일지 동기화</button>
-        <button class="tab-btn" data-admin-tab="request-manage">📮 의뢰 관리</button>
-      </div>
-
-      <!-- AI 분석 탭 -->
-      <div id="admin-tab-analyze" class="admin-tab-content active">
-        <h3>AI 타로 분석</h3>
-        <div class="form-group">
-          <label>질문</label>
-          <textarea id="ai-question" rows="3" placeholder="질문 내용"></textarea>
-        </div>
-        <div class="form-group">
-          <label>스프레드 유형</label>
-          <select id="ai-spread-type">
-            <option value="one-card">원카드</option>
-            <option value="three-past-present-future">쓰리카드: 과거-현재-미래</option>
-            <option value="three-situation-obstacle-advice">쓰리카드: 상황-장애물-조언</option>
-            <option value="three-mind-action-result">쓰리카드: 마음-행동-결과</option>
-            <option value="spirit-tarot">영타로</option>
-          </select>
-        </div>
-
-        <!-- 카드 선택기 -->
-        <div class="form-group">
-          <label>카드 선택</label>
-          <div id="ai-card-selector" class="ai-card-selector"></div>
-          <div id="ai-selected-cards" class="ai-selected-cards"></div>
-        </div>
-
-        <div class="form-group">
-          <label>추가 맥락 (선택)</label>
-          <textarea id="ai-context" rows="2" placeholder="의뢰인 상황 등 추가 정보"></textarea>
-        </div>
-
-        <button class="btn btn-primary btn-lg" onclick="runAIAnalysis()">
-          🤖 AI 분석 실행
-        </button>
-
-        <div id="ai-result" class="ai-result hidden">
-          <h4>분석 결과</h4>
-          <div id="ai-result-content"></div>
-          <button class="btn btn-secondary" onclick="copyAIResult()">📋 복사</button>
-        </div>
-      </div>
-
-      <!-- 일지 동기화 탭 -->
-      <div id="admin-tab-journal-sync" class="admin-tab-content hidden">
-        <h3>Gist 일지 동기화</h3>
-        <div class="form-group">
-          <label>Gist ID (최초 저장 시 비워두세요)</label>
-          <input type="text" id="gist-id" placeholder="Gist ID">
-        </div>
-        <div class="sync-buttons">
-          <button class="btn btn-primary" onclick="saveToGist()">☁️ Gist에 저장</button>
-          <button class="btn btn-secondary" onclick="loadFromGist()">📥 Gist에서 불러오기</button>
-        </div>
-        <div id="sync-result" class="hidden"></div>
-      </div>
+    <!-- 관리자 메인 (로그인 후) -->
+    <section id="admin-main-section" style="display:none;">
+      <nav class="admin-nav">
+        <button class="admin-nav-btn active" data-tab="requests" onclick="switchAdminTab('requests')">📋 의뢰 관리</button>
+        <button class="admin-nav-btn" data-tab="backup" onclick="switchAdminTab('backup')">💾 백업/동기화</button>
+        <button class="admin-nav-btn" data-tab="settings" onclick="switchAdminTab('settings')">🔧 설정</button>
+      </nav>
 
       <!-- 의뢰 관리 탭 -->
-      <div id="admin-tab-request-manage" class="admin-tab-content hidden">
-        <h3>의뢰 관리</h3>
-        <p>의뢰 메일을 확인하고 AI 분석 후 이메일로 회신하세요.</p>
-        <div id="request-list" class="request-list">
-          <p class="empty-message">로컬에 저장된 의뢰가 여기에 표시됩니다.</p>
+      <div id="admin-tab-requests" class="admin-tab active">
+        <h3>📋 의뢰 관리</h3>
+        <div class="admin-toolbar">
+          <span id="request-count">총 0건</span>
+          <button class="btn-secondary btn-sm" onclick="refreshRequests()">🔄 새로고침</button>
+        </div>
+        <div id="admin-request-list" class="request-list">
+          <p class="empty-msg">의뢰가 없습니다</p>
+        </div>
+      </div>
+
+      <!-- 백업/동기화 탭 -->
+      <div id="admin-tab-backup" class="admin-tab" style="display:none;">
+        <h3>💾 Gist 백업 / 동기화</h3>
+        <div class="form-group">
+          <label>Gist ID (저장된 백업이 있으면 자동 입력)</label>
+          <input type="text" id="gist-id-input" placeholder="Gist ID (없으면 새로 생성)">
+        </div>
+        <div class="btn-group">
+          <button class="btn-primary" onclick="saveToGist()">☁️ Gist에 저장</button>
+          <button class="btn-secondary" onclick="loadFromGist()">📥 Gist에서 불러오기</button>
+        </div>
+        <div id="gist-status" class="status-box" style="display:none;"></div>
+      </div>
+
+      <!-- 설정 탭 -->
+      <div id="admin-tab-settings" class="admin-tab" style="display:none;">
+        <h3>🔧 설정</h3>
+
+        <!-- 비밀번호 변경 -->
+        <div class="settings-card">
+          <h4>🔐 비밀번호 변경</h4>
+          <div class="form-group">
+            <label>현재 비밀번호</label>
+            <input type="password" id="current-password" placeholder="현재 비밀번호">
+          </div>
+          <div class="form-group">
+            <label>새 비밀번호</label>
+            <input type="password" id="new-password" placeholder="새 비밀번호 (4자 이상)">
+          </div>
+          <div class="form-group">
+            <label>새 비밀번호 확인</label>
+            <input type="password" id="new-password-confirm" placeholder="새 비밀번호 다시 입력">
+          </div>
+          <button class="btn-primary" onclick="changePassword()">비밀번호 변경</button>
+          <div id="password-change-result" class="status-box" style="display:none;"></div>
+        </div>
+
+        <!-- 데이터 관리 -->
+        <div class="settings-card">
+          <h4>🗑️ 데이터 관리</h4>
+          <button class="btn-danger btn-sm" onclick="clearAllData()">로컬 데이터 전체 삭제</button>
+        </div>
+
+        <!-- 로그아웃 -->
+        <div class="settings-card">
+          <button class="btn-secondary btn-full" onclick="adminLogout()">🚪 로그아웃</button>
         </div>
       </div>
     </section>
   </main>
 
-  <footer id="app-footer">
-    <p class="disclaimer">관리자 전용 페이지</p>
+  <div id="toast-container"></div>
+  <div class="loading-overlay" id="loading-overlay" style="display:none;">
+    <div class="spinner"></div>
+  </div>
+
+  <footer class="app-footer">
+    <p>© 2025 타로 학습 & 운세 - 관리자</p>
   </footer>
 
-  <div id="toast-container"></div>
-
   <script src="js/cards.js"></script>
-  <script src="js/theme.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/theme.js"></script>
   <script src="js/admin.js"></script>
-  <script src="js/gemini.js"></script>
   <script src="js/gist.js"></script>
 </body>
 </html>
