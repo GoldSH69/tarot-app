@@ -1344,3 +1344,175 @@ body {
 .markdown-content ul, .markdown-content ol { margin: 0.5rem 0 0.5rem 1.5rem; }
 .markdown-content li { margin-bottom: 0.25rem; }
 .markdown-content hr { border: none; border-top: 1px solid var(--border-color); margin: 1rem 0; }
+
+/* ============================================
+   추가 스타일 (v1.0.1)
+   ============================================ */
+
+/* ---- 관리자 숨김 링크 ---- */
+.admin-hidden-link {
+  margin-top: 0.5rem;
+}
+
+.admin-hidden-link a {
+  color: var(--border-color);
+  text-decoration: none;
+  font-size: 0.5rem;
+  opacity: 0.3;
+  transition: opacity 0.3s;
+}
+
+.admin-hidden-link a:hover {
+  opacity: 1;
+  color: var(--primary-color);
+}
+
+/* ---- 영타로 가이드 박스 ---- */
+.spirit-guide-box {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.5rem auto;
+  max-width: 600px;
+  text-align: left;
+}
+
+.spirit-guide-box h4 {
+  color: var(--primary-color);
+  margin-bottom: 0.75rem;
+}
+
+.spirit-guide-box ul {
+  list-style: none;
+  padding: 0;
+  margin: 0.75rem 0;
+}
+
+.spirit-guide-box li {
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.spirit-guide-box em {
+  display: block;
+  margin-top: 0.75rem;
+  color: var(--primary-color);
+  font-style: italic;
+}
+
+/* ---- AI 분석 모달 ---- */
+.ai-analysis-section {
+  text-align: center;
+  margin: 1.5rem 0;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(108,92,231,0.05), rgba(162,155,254,0.05));
+  border: 1px dashed var(--primary-color);
+  border-radius: 12px;
+}
+
+.ai-modal-content {
+  max-width: 700px;
+}
+
+.ai-step {
+  margin-top: 1rem;
+}
+
+.prompt-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--card-bg);
+  color: var(--text-color);
+  font-size: 0.85rem;
+  font-family: monospace;
+  line-height: 1.6;
+  resize: vertical;
+  min-height: 300px;
+}
+
+.ai-prompt-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.ai-result-content {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.5rem;
+  line-height: 1.8;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+/* ---- 설정 페이지 ---- */
+.settings-section {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.settings-section h4 {
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+}
+
+.settings-desc {
+  font-size: 0.85rem;
+  color: var(--text-light);
+  margin-bottom: 1rem;
+}
+
+.settings-buttons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.hash-result-box {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--bg-color);
+  border: 1px solid var(--primary-color);
+  border-radius: 8px;
+}
+
+.hash-result-box code {
+  display: block;
+  padding: 0.75rem;
+  background: #2d2d2d;
+  color: #00b894;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  word-break: break-all;
+  margin: 0.5rem 0;
+}
+
+.hash-instructions {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(253,203,110,0.1);
+  border: 1px solid rgba(253,203,110,0.3);
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.hash-instructions ol {
+  margin: 0.5rem 0 0 1.5rem;
+}
+
+.hash-instructions li {
+  margin-bottom: 0.3rem;
+}
+
+.hash-instructions a {
+  color: var(--primary-color);
+}
