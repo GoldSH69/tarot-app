@@ -3,208 +3,345 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>타로 학습 & 운세</title>
+  <title>타로 - 학습 & 리딩</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/themes/default.css" id="theme-stylesheet">
+  <link rel="stylesheet" href="css/themes/default.css" id="theme-link">
 </head>
 <body>
   <!-- 헤더 -->
-  <header class="app-header">
+  <header id="app-header">
     <div class="header-inner">
-      <h1 class="logo" onclick="navigate('home')">🔮 타로 학습 & 운세</h1>
-      <div class="header-right">
-        <button class="btn-icon" id="theme-toggle-btn" onclick="toggleThemeMenu()" title="테마 변경">🎨</button>
-        <a href="admin.html" class="btn-admin-link" title="관리자">⚙️</a>
+      <h1 class="logo" onclick="navigateTo('home')">🔮 타로</h1>
+      <nav id="main-nav">
+        <button class="nav-btn active" data-page="home">홈</button>
+        <button class="nav-btn" data-page="study">📚 학습</button>
+        <button class="nav-btn" data-page="reading">🃏 리딩</button>
+        <button class="nav-btn" data-page="journal">📝 일지</button>
+        <button class="nav-btn" data-page="request">📮 의뢰</button>
+      </nav>
+      <div class="header-actions">
+        <button id="theme-toggle" onclick="cycleTheme()" title="테마 변경">🎨</button>
       </div>
     </div>
-    <nav class="main-nav">
-      <button class="nav-btn active" data-page="home" onclick="navigate('home')">🏠 홈</button>
-      <button class="nav-btn" data-page="study" onclick="navigate('study')">📚 학습</button>
-      <button class="nav-btn" data-page="reading" onclick="navigate('reading')">🃏 리딩</button>
-      <button class="nav-btn" data-page="journal" onclick="navigate('journal')">📖 일지</button>
-      <button class="nav-btn" data-page="request" onclick="navigate('request')">💌 의뢰</button>
-    </nav>
   </header>
 
-  <!-- 테마 메뉴 -->
-  <div class="theme-menu" id="theme-menu" style="display:none;">
-    <button onclick="setTheme('default')">☀️ 클린 화이트</button>
-    <button onclick="setTheme('mystic')">🔮 미스틱</button>
-    <button onclick="setTheme('dark')">🌙 다크</button>
-  </div>
+  <!-- 메인 컨텐츠 -->
+  <main id="app-main">
 
-  <!-- 메인 콘텐츠 -->
-  <main class="main-content">
-    <!-- 홈 페이지 -->
+    <!-- 홈 -->
     <section id="page-home" class="page active">
       <div class="hero">
         <div class="hero-content">
-          <h2>✨ 오늘의 타로 메시지</h2>
-          <p>카드가 전하는 오늘의 이야기를 만나보세요</p>
-          <button class="btn-primary btn-lg" onclick="drawDailyCard()">오늘의 카드 뽑기</button>
+          <h2>타로의 세계에 오신 것을 환영합니다</h2>
+          <p>78장의 카드가 전하는 지혜와 통찰을 만나보세요</p>
+          <div class="hero-buttons">
+            <button class="btn btn-primary btn-lg" onclick="navigateTo('study')">📚 학습 시작</button>
+            <button class="btn btn-secondary btn-lg" onclick="navigateTo('reading')">🃏 카드 뽑기</button>
+          </div>
         </div>
       </div>
-      <div id="daily-card-result"></div>
-
-      <div class="home-grid">
-        <div class="home-card" onclick="navigate('study')">
-          <span class="home-card-icon">📚</span>
+      <div class="home-features">
+        <div class="feature-card" onclick="navigateTo('study')">
+          <span class="feature-icon">📚</span>
           <h3>카드 학습</h3>
-          <p>78장의 타로 카드 의미를 배워보세요</p>
-          <div class="home-card-progress" id="study-progress-home"></div>
+          <p>78장의 타로 카드 의미와 상징을 공부하세요</p>
         </div>
-        <div class="home-card" onclick="navigate('reading')">
-          <span class="home-card-icon">🃏</span>
-          <h3>타로 리딩</h3>
-          <p>질문을 던지고 카드의 답을 들어보세요</p>
+        <div class="feature-card" onclick="navigateTo('reading')">
+          <span class="feature-icon">🃏</span>
+          <h3>카드 리딩</h3>
+          <p>원카드, 쓰리카드, 영타로 등 다양한 스프레드</p>
         </div>
-        <div class="home-card" onclick="navigate('journal')">
-          <span class="home-card-icon">📖</span>
+        <div class="feature-card" onclick="navigateTo('journal')">
+          <span class="feature-icon">📝</span>
           <h3>리딩 일지</h3>
-          <p>나의 리딩 기록을 관리하세요</p>
-          <div class="home-card-stat" id="journal-count-home"></div>
+          <p>나의 리딩 기록을 저장하고 되돌아보세요</p>
         </div>
-        <div class="home-card" onclick="navigate('request')">
-          <span class="home-card-icon">💌</span>
-          <h3>운세 의뢰</h3>
-          <p>전문 리더에게 분석을 요청하세요</p>
+        <div class="feature-card" onclick="navigateTo('request')">
+          <span class="feature-icon">📮</span>
+          <h3>전문가 의뢰</h3>
+          <p>전문가가 직접 분석해드립니다</p>
+        </div>
+      </div>
+      <div class="daily-card-section">
+        <h3>✨ 오늘의 카드</h3>
+        <p class="daily-card-desc">하루를 시작하며 한 장의 카드를 뽑아보세요</p>
+        <button class="btn btn-primary" onclick="drawDailyCard()">오늘의 카드 뽑기</button>
+        <div id="daily-card-result" class="hidden"></div>
+      </div>
+    </section>
+
+    <!-- 학습 -->
+    <section id="page-study" class="page">
+      <div class="page-header">
+        <h2>📚 카드 학습</h2>
+        <div class="study-progress">
+          <span id="study-progress-text">학습 진도: 0 / 78</span>
+          <div class="progress-bar">
+            <div class="progress-fill" id="study-progress-bar"></div>
+          </div>
+        </div>
+      </div>
+      <div class="study-tabs">
+        <button class="tab-btn active" data-category="major">메이저 아르카나 (22)</button>
+        <button class="tab-btn" data-category="wands">완드 (14)</button>
+        <button class="tab-btn" data-category="cups">컵 (14)</button>
+        <button class="tab-btn" data-category="swords">소드 (14)</button>
+        <button class="tab-btn" data-category="pentacles">펜타클 (14)</button>
+      </div>
+      <div class="study-search">
+        <input type="text" id="card-search" placeholder="카드 이름으로 검색..." oninput="filterCards()">
+        <label class="checkbox-label">
+          <input type="checkbox" id="show-bookmarked" onchange="filterCards()"> ⭐ 북마크만
+        </label>
+      </div>
+      <div id="card-grid" class="card-grid"></div>
+      <div id="card-detail-modal" class="modal hidden">
+        <div class="modal-overlay" onclick="closeCardDetail()"></div>
+        <div class="modal-content card-detail-content">
+          <button class="modal-close" onclick="closeCardDetail()">✕</button>
+          <div id="card-detail-body"></div>
         </div>
       </div>
     </section>
 
-    <!-- 학습 페이지 -->
-    <section id="page-study" class="page">
-      <div id="study-container"></div>
-    </section>
-
-    <!-- 리딩 페이지 -->
+    <!-- 리딩 -->
     <section id="page-reading" class="page">
-      <div id="reading-container"></div>
+      <div class="page-header">
+        <h2>🃏 카드 리딩</h2>
+      </div>
+      <div id="spread-selection" class="spread-grid">
+        <div class="spread-card" onclick="startReading('one-card')">
+          <span class="spread-icon">🎴</span>
+          <h3>원카드</h3>
+          <p>한 장으로 핵심 메시지를 받아보세요</p>
+        </div>
+        <div class="spread-card" onclick="showThreeCardOptions()">
+          <span class="spread-icon">🃏</span>
+          <h3>쓰리카드</h3>
+          <p>세 장으로 깊은 통찰을 얻으세요</p>
+        </div>
+        <div class="spread-card" onclick="startReading('spirit-tarot')">
+          <span class="spread-icon">🔮</span>
+          <h3>영타로</h3>
+          <p>직관과 영감으로 카드를 만나보세요</p>
+        </div>
+      </div>
+      <div id="three-card-options" class="hidden">
+        <h3>쓰리카드 스프레드 선택</h3>
+        <div class="spread-grid">
+          <div class="spread-card small" onclick="startReading('three-past-present-future')">
+            <h4>과거 - 현재 - 미래</h4>
+            <p>시간의 흐름 속 답을 찾아보세요</p>
+          </div>
+          <div class="spread-card small" onclick="startReading('three-situation-obstacle-advice')">
+            <h4>상황 - 장애물 - 조언</h4>
+            <p>문제를 분석하고 해결책을 찾으세요</p>
+          </div>
+          <div class="spread-card small" onclick="startReading('three-mind-action-result')">
+            <h4>마음 - 행동 - 결과</h4>
+            <p>내면과 행동의 연결을 살펴보세요</p>
+          </div>
+        </div>
+        <button class="btn btn-secondary" onclick="backToSpreadSelection()">← 뒤로</button>
+      </div>
+      <div id="question-input-section" class="hidden">
+        <h3 id="selected-spread-name"></h3>
+        <div class="question-form">
+          <label>질문 또는 알고 싶은 내용을 입력하세요 (선택사항)</label>
+          <textarea id="reading-question" rows="3" placeholder="예: 올해 나의 커리어는 어떻게 될까요?"></textarea>
+          <button class="btn btn-primary btn-lg" onclick="beginCardDraw()">카드 뽑기 시작 →</button>
+          <button class="btn btn-secondary" onclick="backToSpreadSelection()">← 뒤로</button>
+        </div>
+      </div>
+      <div id="card-draw-area" class="hidden">
+        <div class="draw-instruction">
+          <p id="draw-instruction-text"></p>
+          <span id="draw-count"></span>
+        </div>
+        <div id="card-deck" class="card-deck"></div>
+        <div id="selected-cards-area" class="selected-cards-area"></div>
+      </div>
+      <div id="spirit-tarot-area" class="hidden">
+        <div class="spirit-intro">
+          <h3>🔮 영타로 리딩</h3>
+          <p>마음을 고요히 하고, 질문에 집중하세요</p>
+          <!-- 영타로 가이드 추가 -->
+          <div class="spirit-guide-box">
+            <h4>📖 영타로란?</h4>
+            <p>영타로(Spirit Tarot)는 일반적인 타로 리딩과 달리, <strong>명상과 직관</strong>에 기반한 특별한 리딩 방식입니다.</p>
+            <ul>
+              <li>🧘 <strong>명상 단계:</strong> 15초간 마음을 고요히 하고 질문에 집중합니다</li>
+              <li>🔀 <strong>셔플 단계:</strong> 카드가 영적으로 섞이며, 에너지가 교류됩니다</li>
+              <li>✨ <strong>선택 단계:</strong> "느낌이 올 때" 직관적으로 카드를 선택합니다</li>
+              <li>🌟 <strong>점프카드:</strong> 간혹 카드가 스스로 튀어나옵니다 — 이것은 우주가 보내는 특별한 메시지입니다</li>
+            </ul>
+            <p><em>머리로 생각하지 말고, 마음으로 느끼세요. 끌리는 순간이 바로 당신의 카드를 만나는 순간입니다.</em></p>
+          </div>
+        </div>
+        <div class="spirit-timer" id="spirit-timer">
+          <div class="timer-circle">
+            <span id="timer-count">15</span>
+          </div>
+          <p>명상 중... 마음을 비워주세요</p>
+        </div>
+        <div id="spirit-shuffle" class="hidden">
+          <p class="spirit-instruction">카드가 섞이고 있습니다...<br><strong>"느낌이 올 때"</strong> 아래 버튼을 누르세요</p>
+          <div class="shuffle-animation" id="shuffle-animation">
+            <div class="shuffle-cards">
+              <div class="shuffle-card s1"></div>
+              <div class="shuffle-card s2"></div>
+              <div class="shuffle-card s3"></div>
+              <div class="shuffle-card s4"></div>
+              <div class="shuffle-card s5"></div>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-lg spirit-draw-btn" onclick="spiritDrawCard()">
+            ✨ 이 카드를 선택합니다 ✨
+          </button>
+          <div id="spirit-selected-cards" class="selected-cards-area"></div>
+          <p id="spirit-jump-card" class="hidden jump-card-notice">
+            🌟 점프카드가 감지되었습니다! 우주가 특별한 메시지를 보내고 있습니다.
+          </p>
+        </div>
+      </div>
+
+      <!-- 리딩 결과 -->
+      <div id="reading-result" class="hidden">
+        <h3>리딩 결과</h3>
+        <div id="result-cards" class="result-cards"></div>
+        <div id="result-guide" class="result-guide"></div>
+        
+        <!-- AI 분석 섹션 (새로 추가) -->
+        <div id="ai-analysis-section" class="ai-analysis-section">
+          <button class="btn btn-primary btn-lg" onclick="openAIAnalysisModal()">
+            🤖 AI 전문가 분석 받기
+          </button>
+        </div>
+        
+        <div class="result-actions">
+          <button class="btn btn-primary" onclick="saveToJournal()">📝 일지에 저장</button>
+          <button class="btn btn-secondary" onclick="backToSpreadSelection()">다시 뽑기</button>
+        </div>
+      </div>
     </section>
 
-    <!-- 일지 페이지 -->
+    <!-- 일지 -->
     <section id="page-journal" class="page">
-      <div id="journal-container"></div>
+      <div class="page-header">
+        <h2>📝 리딩 일지</h2>
+        <div class="journal-actions">
+          <button class="btn btn-secondary btn-sm" onclick="exportJournal()">내보내기</button>
+        </div>
+      </div>
+      <div id="journal-list" class="journal-list">
+        <p class="empty-message">아직 저장된 리딩 일지가 없습니다.<br>카드 리딩 후 일지에 저장해 보세요! 📝</p>
+      </div>
     </section>
 
-    <!-- 의뢰 페이지 -->
+    <!-- 의뢰 -->
     <section id="page-request" class="page">
-      <div class="request-section">
-        <h2>💌 운세 분석 의뢰</h2>
-        <p class="section-desc">질문과 고민을 남겨주시면 전문 리더가 분석해드립니다</p>
-
-        <form id="request-form" onsubmit="submitRequest(event)">
+      <div class="page-header">
+        <h2>📮 전문가 리딩 의뢰</h2>
+      </div>
+      <div class="request-content">
+        <div class="request-info">
+          <h3>🌟 전문가가 직접 분석해드립니다</h3>
+          <p>20년 이상의 경력을 가진 타로 전문가가<br>당신의 질문에 깊이 있는 해석을 제공합니다.</p>
+          <ul class="request-features">
+            <li>✅ 상세한 카드 해석</li>
+            <li>✅ 카드 간 관계 분석</li>
+            <li>✅ 구체적인 조언과 가이드</li>
+            <li>✅ 48시간 이내 회신</li>
+          </ul>
+        </div>
+        <form id="request-form" class="request-form" onsubmit="submitRequest(event)">
           <div class="form-group">
-            <label>이름 (닉네임)</label>
-            <input type="text" id="req-name" required placeholder="표시될 이름">
+            <label>이메일 주소</label>
+            <input type="email" id="request-email" required placeholder="회신 받으실 이메일">
           </div>
           <div class="form-group">
-            <label>이메일</label>
-            <input type="email" id="req-email" required placeholder="결과를 받으실 이메일">
+            <label>질문 내용</label>
+            <textarea id="request-question" rows="4" required placeholder="궁금한 내용을 자세히 적어주세요"></textarea>
           </div>
           <div class="form-group">
-            <label>분석 유형</label>
-            <select id="req-type">
-              <option value="onecard">원카드 리딩</option>
-              <option value="threecard">쓰리카드 리딩</option>
-              <option value="spirit">영타로 리딩</option>
+            <label>선호하는 스프레드 (선택)</label>
+            <select id="request-spread">
+              <option value="">전문가에게 맡기기</option>
+              <option value="one-card">원카드</option>
+              <option value="three-card">쓰리카드</option>
+              <option value="celtic-cross">켈틱 크로스</option>
             </select>
           </div>
-          <div class="form-group">
-            <label>질문 / 고민</label>
-            <textarea id="req-question" rows="5" required placeholder="구체적으로 적어주시면 더 정확한 분석이 가능합니다"></textarea>
-          </div>
-          <button type="submit" class="btn-primary btn-lg btn-full">의뢰 제출하기</button>
+          <button type="submit" class="btn btn-primary btn-lg">📮 의뢰 전송</button>
         </form>
       </div>
     </section>
+
   </main>
 
-  <!-- AI 분석 모달 -->
-  <div class="modal-overlay" id="ai-analysis-modal" style="display:none;">
-    <div class="modal ai-modal">
-      <div class="modal-header">
-        <h3>🤖 AI 타로 분석</h3>
-        <button class="modal-close" onclick="closeAIModal()">&times;</button>
+  <!-- AI 분석 모달 (새로 추가) -->
+  <div id="ai-analysis-modal" class="modal hidden">
+    <div class="modal-overlay" onclick="closeAIAnalysisModal()"></div>
+    <div class="modal-content ai-modal-content">
+      <button class="modal-close" onclick="closeAIAnalysisModal()">✕</button>
+      <h3>🤖 AI 전문가 분석</h3>
+      
+      <!-- STEP 1: 비밀번호 입력 -->
+      <div id="ai-step-password" class="ai-step">
+        <div class="form-group">
+          <label>관리자 비밀번호</label>
+          <input type="password" id="ai-modal-password" placeholder="비밀번호 입력" 
+                 onkeypress="if(event.key==='Enter') verifyAIPassword()">
+        </div>
+        <button class="btn btn-primary" onclick="verifyAIPassword()">확인</button>
+        <p id="ai-password-error" class="error-text hidden"></p>
       </div>
-      <div class="modal-body">
-        <!-- Step 1: 비밀번호 입력 -->
-        <div id="ai-step-password">
-          <p class="ai-step-desc">AI 분석을 위해 관리자 비밀번호를 입력하세요</p>
-          <div class="form-group">
-            <input type="password" id="ai-password" placeholder="관리자 비밀번호" onkeydown="if(event.key==='Enter')verifyAIPassword()">
-          </div>
-          <button class="btn-primary btn-full" onclick="verifyAIPassword()">확인</button>
+      
+      <!-- STEP 2: 프롬프트 미리보기 & 수정 -->
+      <div id="ai-step-prompt" class="ai-step hidden">
+        <div class="form-group">
+          <label>📋 AI에게 보낼 프롬프트 (수정 가능)</label>
+          <textarea id="ai-prompt-preview" rows="15" class="prompt-textarea"></textarea>
         </div>
-
-        <!-- Step 2: 프롬프트 확인/수정 -->
-        <div id="ai-step-prompt" style="display:none;">
-          <p class="ai-step-desc">AI에게 보낼 분석 요청 내용입니다. 수정할 수 있습니다.</p>
-          <div class="form-group">
-            <textarea id="ai-prompt-text" rows="12" class="ai-prompt-textarea"></textarea>
-          </div>
-          <div class="ai-prompt-actions">
-            <button class="btn-secondary" onclick="copyAIPrompt()">📋 프롬프트 복사</button>
-            <button class="btn-primary" onclick="executeAIAnalysis()">🔮 분석 진행</button>
-          </div>
+        <div class="ai-prompt-actions">
+          <button class="btn btn-secondary" onclick="copyAIPrompt()">📋 프롬프트 복사</button>
+          <button class="btn btn-primary btn-lg" onclick="executeAIAnalysis()">🔮 분석 진행</button>
         </div>
-
-        <!-- Step 3: 분석 결과 -->
-        <div id="ai-step-result" style="display:none;">
-          <div id="ai-result-content" class="ai-result-box"></div>
-          <div class="ai-result-actions">
-            <button class="btn-secondary" onclick="copyAIResult()">📋 결과 복사</button>
-            <button class="btn-secondary" onclick="goBackToPrompt()">✏️ 프롬프트 수정</button>
-            <button class="btn-primary" onclick="closeAIModal()">확인</button>
-          </div>
-        </div>
-
-        <!-- 로딩 -->
-        <div id="ai-step-loading" style="display:none;">
-          <div class="ai-loading">
-            <div class="spinner"></div>
-            <p>AI가 카드를 분석하고 있습니다...</p>
-            <p class="ai-loading-sub">최대 30초 정도 소요됩니다</p>
-          </div>
+      </div>
+      
+      <!-- STEP 3: 결과 -->
+      <div id="ai-step-result" class="ai-step hidden">
+        <div id="ai-modal-result" class="ai-result-content"></div>
+        <div class="ai-prompt-actions" style="margin-top:1rem;">
+          <button class="btn btn-secondary" onclick="copyAIModalResult()">📋 결과 복사</button>
+          <button class="btn btn-secondary" onclick="closeAIAnalysisModal()">닫기</button>
         </div>
       </div>
     </div>
-  </div>
-
-  <!-- 카드 상세 모달 -->
-  <div class="modal-overlay" id="card-modal" style="display:none;">
-    <div class="modal">
-      <div class="modal-header">
-        <h3 id="modal-card-name"></h3>
-        <button class="modal-close" onclick="closeCardModal()">&times;</button>
-      </div>
-      <div class="modal-body" id="modal-card-body"></div>
-    </div>
-  </div>
-
-  <!-- 토스트 -->
-  <div id="toast-container"></div>
-
-  <!-- 로딩 오버레이 -->
-  <div class="loading-overlay" id="loading-overlay" style="display:none;">
-    <div class="spinner"></div>
   </div>
 
   <!-- 푸터 -->
-  <footer class="app-footer">
-    <p>타로 카드 리딩은 참고용이며, 중요한 결정은 전문가와 상담하세요.</p>
-    <p>© 2025 타로 학습 & 운세. All rights reserved.</p>
+  <footer id="app-footer">
+    <p class="disclaimer">
+      본 서비스는 타로 카드 학습과 자기성찰을 위한 도구로 제공됩니다.<br>
+      타로 리딩 결과는 참고용이며, 중요한 의사결정(의료, 법률, 재정 등)의 근거로 사용해서는 안 됩니다.
+    </p>
+    <p class="copyright">© 2025 타로 학습 & 리딩</p>
+    <!-- 관리자 링크 (숨김) -->
+    <p class="admin-hidden-link">
+      <a href="admin.html" title="관리">·</a>
+    </p>
   </footer>
 
-  <!-- 스크립트 -->
+  <div id="toast-container"></div>
+
   <script src="js/cards.js"></script>
-  <script src="js/app.js"></script>
   <script src="js/theme.js"></script>
+  <script src="js/app.js"></script>
   <script src="js/study.js"></script>
   <script src="js/reading.js"></script>
   <script src="js/spirit-tarot.js"></script>
   <script src="js/journal.js"></script>
   <script src="js/gemini.js"></script>
-  <script src="js/gist.js"></script>
 </body>
 </html>
