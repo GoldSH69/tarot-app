@@ -1,250 +1,423 @@
-/**
- * 메인 앱 로직
- * 페이지 네비게이션, 토스트, 공통 유틸리티
- */
+// ========================================
+// app.js - 메인 앱 로직
+// ========================================
 
-// ============================================
-// Cloudflare Worker URL — 여기만 수정!
-// ============================================
 const WORKER_URL = 'https://tarot-api.ashywindy.workers.dev';
+// ↑ 실제 Worker URL로 교체
 
-// ============================================
+// ========================================
 // 페이지 네비게이션
-// ============================================
+// ========================================
 let currentPage = 'home';
 
-function navigateTo(page) {
-  // 모든 페이지 숨기기
+function navigate(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
 
-  // 선택한 페이지 표시
-  const target = document.getElementById(`page-${page}`);
-  if (target) {
-    target.classList.add('active');
-    currentPage = page;
-  }
+  const pageEl = document.getElementById(`page-${page}`);
+  const navBtn = document.querySelector(`.nav-btn[data-page="${page}"]`);
 
-  // 네비게이션 버튼 업데이트
-  document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.page === page);
-  });
+  if (pageEl) pageEl.classList.add('active');
+  if (navBtn) navBtn.classList.add('active');
 
-  // 리딩 페이지 초기화
-  if (page === 'reading') {
-    backToSpreadSelection();
-  }
+  currentPage = page;
 
   // 페이지별 초기화
-  if (page === 'study') {
-    initStudyPage();
-  } else if (page === 'journal') {
-    renderJournalList();
+  switch (page) {
+    case 'home': initHome(); break;
+    case 'study': initStudy(); break;
+    case 'reading': initReading(); break;
+    case 'journal': initJournal(); break;
   }
 
-  // 스크롤 맨 위로
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo(0, 0);
 }
 
-// ============================================
-// 네비게이션 이벤트 바인딩
-// ============================================
-document.addEventListener('DOMContentLoaded', () => {
-  // 네비게이션 버튼
-  document.querySelectorAll('.nav-btn[data-page]').forEach(btn => {
-    btn.addEventListener('click', () => navigateTo(btn.dataset.page));
-  });
-
-  // 학습 탭 버튼
-  document.querySelectorAll('.study-tabs .tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.study-tabs .tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderCardGrid(btn.dataset.category);
-    });
-  });
-
-  // 관리자 탭 버튼 (admin.html용)
-  document.querySelectorAll('.admin-tabs .tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.admin-tabs .tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
-      const target = document.getElementById(`admin-tab-${btn.dataset.adminTab}`);
-      if (target) target.classList.add('active');
-    });
-  });
-});
-
-// ============================================
-// 토스트 알림
-// ============================================
-function showToast(message, type = 'info') {
-  const container = document.getElementById('toast-container');
-  if (!container) return;
-
-  const toast = document.createElement('div');
-  toast.className = `toast ${type}`;
-  toast.textContent = message;
-  container.appendChild(toast);
-
-  setTimeout(() => {
-    if (toast.parentNode) {
-      toast.parentNode.removeChild(toast);
-    }
-  }, 3000);
+// ========================================
+// 홈 페이지
+// ========================================
+function initHome() {
+  updateStudyProgressHome();
+  updateJournalCountHome();
 }
 
-// ============================================
-// 로딩 오버레이
-// ============================================
-function showLoading(message = '처리 중...') {
-  const overlay = document.createElement('div');
-  overlay.className = 'loading-overlay';
-  overlay.id = 'loading-overlay';
-  overlay.innerHTML = `
-    <div class="loading-spinner"></div>
-    <p>${message}</p>
-  `;
-  document.body.appendChild(overlay);
+function updateStudyProgressHome() {
+  const studied = JSON.parse(localStorage.getItem('tarot-studied') || '[]');
+  const total = 78;
+  const el = document.getElementById('study-progress-home');
+  if (el) {
+    const pct = Math.round((studied.length / total) * 100);
+    el.innerHTML = `<div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div><span>${studied.length}/${total} (${pct}%)</span>`;
+  }
 }
 
-function hideLoading() {
-  const overlay = document.getElementById('loading-overlay');
-  if (overlay) overlay.remove();
+function updateJournalCountHome() {
+  const journal = JSON.parse(localStorage.getItem('tarot-journal') || '[]');
+  const el = document.getElementById('journal-count-home');
+  if (el) {
+    el.textContent = `${journal.length}건의 기록`;
+  }
 }
 
-// ============================================
+// ========================================
 // 오늘의 카드
-// ============================================
+// ========================================
 function drawDailyCard() {
+  const allCards = getAllCards();
   const today = new Date().toDateString();
-  const saved = localStorage.getItem('tarot-daily-card');
+  const saved = localStorage.getItem('tarot-daily');
 
   if (saved) {
-    const data = JSON.parse(saved);
-    if (data.date === today) {
-      displayDailyCard(data.cardId, data.reversed);
+    const parsed = JSON.parse(saved);
+    if (parsed.date === today) {
+      showDailyCard(parsed.card, parsed.reversed);
       return;
     }
   }
 
-  const allCards = getAllCards();
-  const randomIndex = Math.floor(Math.random() * allCards.length);
-  const card = allCards[randomIndex];
-  const reversed = Math.random() < 0.3; // 30% 확률로 역방향
+  const card = allCards[Math.floor(Math.random() * allCards.length)];
+  const reversed = Math.random() > 0.5;
 
-  localStorage.setItem('tarot-daily-card', JSON.stringify({
+  localStorage.setItem('tarot-daily', JSON.stringify({
     date: today,
-    cardId: card.id,
-    reversed
+    card: card,
+    reversed: reversed
   }));
 
-  displayDailyCard(card.id, reversed);
+  showDailyCard(card, reversed);
 }
 
-function displayDailyCard(cardId, reversed) {
-  const card = findCardById(cardId);
-  if (!card) return;
-
+function showDailyCard(card, reversed) {
+  const container = document.getElementById('daily-card-result');
   const direction = reversed ? '역방향' : '정방향';
   const meaning = reversed ? card.reversed : card.upright;
-  const imgClass = reversed ? 'reversed' : '';
+  const imageUrl = getCardImageUrl(card);
 
-  const container = document.getElementById('daily-card-result');
-  container.classList.remove('hidden');
   container.innerHTML = `
-    <div class="result-card-item" style="margin: 1rem auto;">
-      <img src="${getCardImageUrl(card)}" alt="${card.name}" class="${imgClass}"
-           onerror="this.src='${createCardPlaceholder(card)}'">
-      <div class="result-card-name">${card.name}</div>
-      <div class="result-card-direction">${direction}</div>
-    </div>
-    <div class="result-guide" style="margin-top: 1rem;">
-      <h4>✨ 오늘의 메시지</h4>
-      <div class="keywords" style="margin-bottom: 0.5rem;">
-        ${meaning.keywords.map(k => `<span class="keyword ${reversed ? 'reversed' : 'upright'}">${k}</span>`).join('')}
+    <div class="daily-card-display">
+      <div class="daily-card-image ${reversed ? 'reversed' : ''}">
+        <img src="${imageUrl}" alt="${card.name}" onerror="this.outerHTML=createCardPlaceholder(findCardById('${card.id}'))">
       </div>
-      <p>${meaning.meaning}</p>
+      <div class="daily-card-info">
+        <h3>${card.name} <span class="card-name-en">${card.nameEn}</span></h3>
+        <span class="badge badge-${reversed ? 'reversed' : 'upright'}">${direction}</span>
+        <div class="card-keywords">
+          ${meaning.keywords.map(k => `<span class="keyword">${k}</span>`).join('')}
+        </div>
+        <p class="card-meaning">${meaning.meaning}</p>
+        <button class="btn-ai-analysis" onclick="openAIAnalysis('daily', [{card: window._dailyCardData.card, reversed: window._dailyCardData.reversed, position: '오늘의 메시지'}], '오늘 하루에 대한 조언')">
+          🤖 AI 분석
+        </button>
+      </div>
     </div>
   `;
+
+  // AI 분석용 데이터 저장
+  window._dailyCardData = { card, reversed };
 }
 
-// ============================================
-// 이메일 의뢰
-// ============================================
+// ========================================
+// 의뢰 제출
+// ========================================
 function submitRequest(event) {
   event.preventDefault();
 
-  const email = document.getElementById('request-email').value;
-  const question = document.getElementById('request-question').value;
-  const spread = document.getElementById('request-spread').value;
+  const name = document.getElementById('req-name').value.trim();
+  const email = document.getElementById('req-email').value.trim();
+  const type = document.getElementById('req-type').value;
+  const question = document.getElementById('req-question').value.trim();
 
-  // 로컬에 저장 (관리자가 확인)
-  const requests = JSON.parse(localStorage.getItem('tarot-requests') || '[]');
-  requests.push({
-    id: Date.now(),
+  if (!name || !email || !question) {
+    showToast('모든 항목을 입력해주세요', 'error');
+    return;
+  }
+
+  const request = {
+    id: 'req-' + Date.now(),
+    name,
     email,
+    type,
     question,
-    spread,
-    date: new Date().toISOString(),
-    status: 'pending'
-  });
+    status: 'pending',
+    createdAt: new Date().toISOString()
+  };
+
+  // localStorage에 의뢰 저장
+  const requests = JSON.parse(localStorage.getItem('tarot-requests') || '[]');
+  requests.unshift(request);
   localStorage.setItem('tarot-requests', JSON.stringify(requests));
 
-  // mailto 링크로 이메일 전송
-  const subject = encodeURIComponent('[타로 리딩 의뢰] 전문가 분석 요청');
-  const body = encodeURIComponent(
-    `안녕하세요, 타로 리딩을 의뢰드립니다.\n\n` +
-    `이메일: ${email}\n` +
-    `질문: ${question}\n` +
-    `선호 스프레드: ${spread || '전문가 추천'}\n` +
-    `날짜: ${new Date().toLocaleString('ko-KR')}`
-  );
-
-  window.open(`mailto:?subject=${subject}&body=${body}`);
-
-  showToast('의뢰가 접수되었습니다! 이메일을 확인해주세요.', 'success');
+  showToast('의뢰가 제출되었습니다! 관리자가 확인 후 분석해드립니다.', 'success');
   document.getElementById('request-form').reset();
 }
 
-// ============================================
-// 유틸리티
-// ============================================
-function shuffleArray(array) {
-  const arr = [...array];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
+// ========================================
+// AI 분석 모달 (일반 화면용)
+// ========================================
+let aiAnalysisData = {};
+
+function openAIAnalysis(spreadType, cards, question) {
+  aiAnalysisData = { spreadType, cards, question };
+
+  // 모달 표시
+  document.getElementById('ai-analysis-modal').style.display = 'flex';
+
+  // Step 1: 비밀번호 입력으로 시작
+  showAIStep('password');
+
+  // 비밀번호 입력란 포커스
+  setTimeout(() => {
+    const pwInput = document.getElementById('ai-password');
+    if (pwInput) pwInput.focus();
+  }, 100);
+}
+
+function closeAIModal() {
+  document.getElementById('ai-analysis-modal').style.display = 'none';
+  document.getElementById('ai-password').value = '';
+  showAIStep('password');
+}
+
+function showAIStep(step) {
+  ['password', 'prompt', 'result', 'loading'].forEach(s => {
+    const el = document.getElementById(`ai-step-${s}`);
+    if (el) el.style.display = (s === step) ? 'block' : 'none';
+  });
+}
+
+async function verifyAIPassword() {
+  const password = document.getElementById('ai-password').value;
+  if (!password) {
+    showToast('비밀번호를 입력하세요', 'error');
+    return;
   }
-  return arr;
+
+  try {
+    showAIStep('loading');
+
+    const res = await fetch(`${WORKER_URL}/api/verify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      aiAnalysisData.password = password;
+
+      // 프롬프트 생성
+      const prompt = generateAIPrompt(aiAnalysisData);
+      document.getElementById('ai-prompt-text').value = prompt;
+
+      showAIStep('prompt');
+    } else {
+      showAIStep('password');
+      showToast('비밀번호가 틀립니다', 'error');
+    }
+  } catch (err) {
+    showAIStep('password');
+    showToast('서버 연결 실패: ' + err.message, 'error');
+  }
+}
+
+function generateAIPrompt(data) {
+  const { spreadType, cards, question } = data;
+
+  let spreadName = '';
+  switch (spreadType) {
+    case 'daily': spreadName = '오늘의 카드 (원카드)'; break;
+    case 'onecard': spreadName = '원카드 리딩'; break;
+    case 'threecard-time': spreadName = '쓰리카드 (과거/현재/미래)'; break;
+    case 'threecard-situation': spreadName = '쓰리카드 (상황/원인/조언)'; break;
+    case 'threecard-mind': spreadName = '쓰리카드 (의식/무의식/조언)'; break;
+    case 'spirit': spreadName = '영타로 (3장)'; break;
+    default: spreadName = spreadType; break;
+  }
+
+  let cardInfo = cards.map((c, i) => {
+    const card = c.card;
+    const dir = c.reversed ? '역방향' : '정방향';
+    const meaning = c.reversed ? card.reversed : card.upright;
+    return `${i + 1}. [${c.position || '카드 ' + (i + 1)}] ${card.name} (${card.nameEn}) - ${dir}
+   키워드: ${meaning.keywords.join(', ')}
+   기본 의미: ${meaning.meaning}`;
+  }).join('\n\n');
+
+  let prompt = `당신은 20년 경력의 전문 타로 리더입니다.
+아래 타로 리딩 결과를 전문적으로 분석해주세요.
+
+===== 리딩 정보 =====
+• 스프레드: ${spreadName}
+• 질문/주제: ${question || '일반 운세'}
+
+===== 뽑은 카드 =====
+${cardInfo}
+
+===== 분석 요청 =====
+1. 각 카드의 위치별 상세 해석
+2. 카드들 간의 관계와 흐름 분석
+3. 질문에 대한 종합적인 답변
+4. 구체적인 조언과 행동 지침
+5. 주의할 점이나 숨겨진 메시지
+
+전문적이면서도 따뜻한 어조로, 한국어로 답변해주세요.
+마크다운 형식으로 작성해주세요.`;
+
+  return prompt;
+}
+
+function copyAIPrompt() {
+  const text = document.getElementById('ai-prompt-text').value;
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('프롬프트가 클립보드에 복사되었습니다', 'success');
+  }).catch(() => {
+    // fallback
+    const ta = document.getElementById('ai-prompt-text');
+    ta.select();
+    document.execCommand('copy');
+    showToast('프롬프트가 복사되었습니다', 'success');
+  });
+}
+
+async function executeAIAnalysis() {
+  const prompt = document.getElementById('ai-prompt-text').value;
+  const password = aiAnalysisData.password;
+
+  if (!prompt || !password) {
+    showToast('프롬프트 또는 인증 정보가 없습니다', 'error');
+    return;
+  }
+
+  showAIStep('loading');
+
+  try {
+    const res = await fetch(`${WORKER_URL}/api/analyze`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password, prompt })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      const resultHtml = formatMarkdown(data.result);
+      document.getElementById('ai-result-content').innerHTML = resultHtml;
+      aiAnalysisData.lastResult = data.result;
+      showAIStep('result');
+    } else {
+      showAIStep('prompt');
+      showToast('AI 분석 실패: ' + (data.message || '알 수 없는 오류'), 'error');
+    }
+  } catch (err) {
+    showAIStep('prompt');
+    showToast('서버 오류: ' + err.message, 'error');
+  }
+}
+
+function copyAIResult() {
+  const text = aiAnalysisData.lastResult || '';
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('분석 결과가 복사되었습니다', 'success');
+  }).catch(() => {
+    showToast('복사에 실패했습니다', 'error');
+  });
+}
+
+function goBackToPrompt() {
+  showAIStep('prompt');
+}
+
+// 마크다운 → HTML 변환
+function formatMarkdown(text) {
+  if (!text) return '';
+  return text
+    .replace(/### (.*)/g, '<h4>\$1</h4>')
+    .replace(/## (.*)/g, '<h3>\$1</h3>')
+    .replace(/# (.*)/g, '<h2>\$1</h2>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>\$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>\$1</em>')
+    .replace(/`(.*?)`/g, '<code>\$1</code>')
+    .replace(/^- (.*)/gm, '<li>\$1</li>')
+    .replace(/(<li>.*<\/li>)/s, '<ul>\$1</ul>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br>')
+    .replace(/^(.*)$/, '<p>\$1</p>');
+}
+
+// ========================================
+// 토스트 알림
+// ========================================
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+
+  const icon = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' }[type] || 'ℹ️';
+  toast.innerHTML = `<span class="toast-icon">${icon}</span><span>${message}</span>`;
+
+  container.appendChild(toast);
+
+  setTimeout(() => toast.classList.add('show'), 10);
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+// ========================================
+// 로딩 오버레이
+// ========================================
+function showLoading() {
+  document.getElementById('loading-overlay').style.display = 'flex';
+}
+
+function hideLoading() {
+  document.getElementById('loading-overlay').style.display = 'none';
+}
+
+// ========================================
+// 유틸리티
+// ========================================
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
 }
 
 function formatDate(dateStr) {
   const d = new Date(dateStr);
-  return d.toLocaleDateString('ko-KR', {
-    year: 'numeric', month: 'long', day: 'numeric',
-    hour: '2-digit', minute: '2-digit'
-  });
+  return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
 }
 
 function getSpreadName(type) {
   const names = {
-    'one-card': '원카드',
-    'three-past-present-future': '쓰리카드: 과거-현재-미래',
-    'three-situation-obstacle-advice': '쓰리카드: 상황-장애물-조언',
-    'three-mind-action-result': '쓰리카드: 마음-행동-결과',
-    'spirit-tarot': '영타로'
+    'onecard': '원카드',
+    'threecard-time': '쓰리카드 (과거/현재/미래)',
+    'threecard-situation': '쓰리카드 (상황/원인/조언)',
+    'threecard-mind': '쓰리카드 (의식/무의식/조언)',
+    'spirit': '영타로'
   };
   return names[type] || type;
 }
 
-function getPositionLabels(spreadType) {
+function getPositionLabels(type) {
   const labels = {
-    'one-card': ['현재 상황/답변'],
-    'three-past-present-future': ['과거', '현재', '미래'],
-    'three-situation-obstacle-advice': ['상황', '장애물', '조언'],
-    'three-mind-action-result': ['마음', '행동', '결과'],
-    'spirit-tarot': ['첫 번째 메시지', '두 번째 메시지', '세 번째 메시지']
+    'onecard': ['메시지'],
+    'threecard-time': ['과거', '현재', '미래'],
+    'threecard-situation': ['상황', '원인', '조언'],
+    'threecard-mind': ['의식', '무의식', '조언'],
+    'spirit': ['첫 번째 메시지', '두 번째 메시지', '세 번째 메시지']
   };
-  return labels[spreadType] || ['카드'];
+  return labels[type] || ['카드'];
 }
+
+// ========================================
+// 초기화
+// ========================================
+document.addEventListener('DOMContentLoaded', () => {
+  initHome();
+});
