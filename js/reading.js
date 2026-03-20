@@ -1,241 +1,257 @@
-/**
- * 카드 리딩 모듈
- * 원카드, 쓰리카드 스프레드
- */
+// ========================================
+// reading.js - 리딩 모듈
+// ========================================
 
-let currentSpreadType = '';
-let currentQuestion = '';
-let selectedReadingCards = [];
-let requiredCardCount = 1;
-let deckCards = [];
+let readingState = {
+  spread: null,
+  question: '',
+  deck: [],
+  selected: [],
+  maxCards: 1,
+  positionLabels: []
+};
 
-// ============================================
-// 스프레드 선택
-// ============================================
-function backToSpreadSelection() {
-  document.getElementById('spread-selection').classList.remove('hidden');
-  document.getElementById('three-card-options').classList.add('hidden');
-  document.getElementById('question-input-section').classList.add('hidden');
-  document.getElementById('card-draw-area').classList.add('hidden');
-  document.getElementById('spirit-tarot-area').classList.add('hidden');
-  document.getElementById('reading-result').classList.add('hidden');
+function initReading() {
+  const container = document.getElementById('reading-container');
+  container.innerHTML = `
+    <h2>🃏 타로 리딩</h2>
+    <p class="section-desc">질문을 마음에 품고, 카드를 선택하세요</p>
 
-  selectedReadingCards = [];
-  currentSpreadType = '';
-  currentQuestion = '';
-}
-
-function showThreeCardOptions() {
-  document.getElementById('spread-selection').classList.add('hidden');
-  document.getElementById('three-card-options').classList.remove('hidden');
-}
-
-function startReading(spreadType) {
-  currentSpreadType = spreadType;
-
-  if (spreadType === 'one-card') {
-    requiredCardCount = 1;
-  } else if (spreadType.startsWith('three-')) {
-    requiredCardCount = 3;
-  } else if (spreadType === 'spirit-tarot') {
-    requiredCardCount = 3;
-  }
-
-  document.getElementById('spread-selection').classList.add('hidden');
-  document.getElementById('three-card-options').classList.add('hidden');
-
-  if (spreadType === 'spirit-tarot') {
-    startSpiritTarot();
-    return;
-  }
-
-  document.getElementById('question-input-section').classList.remove('hidden');
-  document.getElementById('selected-spread-name').textContent =
-    `🃏 ${getSpreadName(spreadType)}`;
-}
-
-// ============================================
-// 카드 뽑기 시작
-// ============================================
-function beginCardDraw() {
-  currentQuestion = document.getElementById('reading-question').value;
-
-  document.getElementById('question-input-section').classList.add('hidden');
-  document.getElementById('card-draw-area').classList.remove('hidden');
-
-  selectedReadingCards = [];
-  generateDeck();
-  updateDrawInstruction();
-}
-
-function generateDeck() {
-  const deck = document.getElementById('card-deck');
-  const allCards = shuffleArray(getAllCards());
-  deckCards = allCards;
-
-  // 뒤집힌 카드들을 덱으로 표시 (많이 표시)
-  const displayCount = Math.min(allCards.length, 40);
-  deck.innerHTML = '';
-
-  for (let i = 0; i < displayCount; i++) {
-    const div = document.createElement('div');
-    div.className = 'deck-card';
-    div.dataset.index = i;
-    div.addEventListener('click', () => selectDeckCard(i));
-    deck.appendChild(div);
-  }
-}
-
-function selectDeckCard(index) {
-  if (selectedReadingCards.length >= requiredCardCount) return;
-
-  const deckCardEl = document.querySelector(`.deck-card[data-index="${index}"]`);
-  if (!deckCardEl || deckCardEl.classList.contains('selected')) return;
-
-  deckCardEl.classList.add('selected');
-
-  const card = deckCards[index];
-  const reversed = Math.random() < 0.3;
-
-  selectedReadingCards.push({
-    ...card,
-    reversed
-  });
-
-  renderSelectedCards();
-  updateDrawInstruction();
-
-  if (selectedReadingCards.length >= requiredCardCount) {
-    setTimeout(() => showReadingResult(), 800);
-  }
-}
-
-function renderSelectedCards() {
-  const area = document.getElementById('selected-cards-area');
-  const labels = getPositionLabels(currentSpreadType);
-
-  area.innerHTML = selectedReadingCards.map((card, i) => {
-    const imgClass = card.reversed ? 'reversed' : '';
-    const direction = card.reversed ? '역방향' : '정방향';
-    return `
-      <div class="selected-card-slot">
-        <div class="card-position-label">${labels[i] || `카드 ${i + 1}`}</div>
-        <img src="${getCardImageUrl(card)}" alt="${card.name}" class="${imgClass}"
-             onerror="this.src='${createCardPlaceholder(card)}'">
-        <div class="card-name-label">${card.name}</div>
-        <div class="card-direction">${direction}</div>
-      </div>
-    `;
-  }).join('');
-}
-
-function updateDrawInstruction() {
-  const text = document.getElementById('draw-instruction-text');
-  const count = document.getElementById('draw-count');
-  const remaining = requiredCardCount - selectedReadingCards.length;
-
-  if (remaining > 0) {
-    text.textContent = '마음을 집중하고, 끌리는 카드를 선택하세요';
-    count.textContent = `남은 선택: ${remaining}장`;
-  } else {
-    text.textContent = '✨ 모든 카드를 선택하셨습니다!';
-    count.textContent = '';
-  }
-}
-
-// ============================================
-// 리딩 결과 표시
-// ============================================
-function showReadingResult() {
-  document.getElementById('card-draw-area').classList.add('hidden');
-  document.getElementById('spirit-tarot-area').classList.add('hidden');
-  document.getElementById('reading-result').classList.remove('hidden');
-
-  const resultCards = document.getElementById('result-cards');
-  const resultGuide = document.getElementById('result-guide');
-  const labels = getPositionLabels(currentSpreadType);
-
-  // 카드 표시
-  resultCards.innerHTML = selectedReadingCards.map((card, i) => {
-    const imgClass = card.reversed ? 'reversed' : '';
-    const direction = card.reversed ? '역방향' : '정방향';
-    return `
-      <div class="result-card-item">
-        <div class="position-label">${labels[i] || `카드 ${i + 1}`}</div>
-        <img src="${getCardImageUrl(card)}" alt="${card.name}" class="${imgClass}"
-             onerror="this.src='${createCardPlaceholder(card)}'">
-        <div class="result-card-name">${card.name}</div>
-        <div class="result-card-direction">${direction}</div>
-      </div>
-    `;
-  }).join('');
-
-  // 기본 가이드 (AI 분석 없이)
-  let guideHtml = `<h4>📖 리딩 가이드</h4>`;
-
-  if (currentQuestion) {
-    guideHtml += `<p><strong>질문:</strong> ${currentQuestion}</p><hr style="border:none;border-top:1px solid var(--border-color);margin:0.75rem 0;">`;
-  }
-
-  selectedReadingCards.forEach((card, i) => {
-    const meaning = card.reversed ? card.reversed : card.upright;
-    const direction = card.reversed ? '역방향 🔄' : '정방향 ☀️';
-    const posLabel = labels[i] || `카드 ${i + 1}`;
-
-    guideHtml += `
-      <div style="margin-bottom: 1rem;">
-        <h4 style="color: var(--primary-color); font-size: 0.95rem;">
-          [${posLabel}] ${card.name} — ${direction}
-        </h4>
-        <div class="keywords" style="margin: 0.3rem 0;">
-          ${meaning.keywords.map(k => `<span class="keyword ${card.reversed ? 'reversed' : 'upright'}">${k}</span>`).join('')}
+    <!-- 스프레드 선택 -->
+    <div id="reading-spread-select" class="spread-select">
+      <h3>스프레드 선택</h3>
+      <div class="spread-options">
+        <div class="spread-option" onclick="selectSpread('onecard')">
+          <span class="spread-icon">🎴</span>
+          <h4>원카드</h4>
+          <p>간단한 질문에 한 장의 답</p>
         </div>
-        <p style="font-size: 0.9rem;">${meaning.meaning}</p>
+        <div class="spread-option" onclick="selectSpread('threecard-time')">
+          <span class="spread-icon">🕐</span>
+          <h4>쓰리카드 - 시간</h4>
+          <p>과거 / 현재 / 미래</p>
+        </div>
+        <div class="spread-option" onclick="selectSpread('threecard-situation')">
+          <span class="spread-icon">🔍</span>
+          <h4>쓰리카드 - 상황</h4>
+          <p>상황 / 원인 / 조언</p>
+        </div>
+        <div class="spread-option" onclick="selectSpread('threecard-mind')">
+          <span class="spread-icon">🧠</span>
+          <h4>쓰리카드 - 마음</h4>
+          <p>의식 / 무의식 / 조언</p>
+        </div>
+        <div class="spread-option spread-option-spirit" onclick="navigate('reading'); startSpiritTarot();">
+          <span class="spread-icon">👁️</span>
+          <h4>영타로</h4>
+          <p>직감으로 3장 선택</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 질문 입력 -->
+    <div id="reading-question" style="display:none;">
+      <h3>질문을 입력하세요</h3>
+      <div class="form-group">
+        <textarea id="reading-question-input" rows="3" placeholder="카드에게 물어보고 싶은 것을 적어주세요"></textarea>
+      </div>
+      <div class="btn-group">
+        <button class="btn-secondary" onclick="backToSpreadSelect()">← 돌아가기</button>
+        <button class="btn-primary" onclick="startCardSelection()">카드 선택하기 →</button>
+      </div>
+    </div>
+
+    <!-- 카드 선택 -->
+    <div id="reading-deck" style="display:none;">
+      <h3 id="reading-deck-title">카드를 선택하세요</h3>
+      <p id="reading-deck-sub" class="section-desc"></p>
+      <div class="card-deck" id="reading-card-deck"></div>
+      <div class="btn-group">
+        <button class="btn-secondary" onclick="backToQuestion()">← 돌아가기</button>
+      </div>
+    </div>
+
+    <!-- 결과 -->
+    <div id="reading-result" style="display:none;"></div>
+  `;
+}
+
+function selectSpread(type) {
+  readingState.spread = type;
+  readingState.maxCards = type === 'onecard' ? 1 : 3;
+  readingState.positionLabels = getPositionLabels(type);
+  readingState.selected = [];
+
+  document.getElementById('reading-spread-select').style.display = 'none';
+  document.getElementById('reading-question').style.display = 'block';
+
+  document.getElementById('reading-question-input').focus();
+}
+
+function backToSpreadSelect() {
+  document.getElementById('reading-question').style.display = 'none';
+  document.getElementById('reading-spread-select').style.display = 'block';
+}
+
+function backToQuestion() {
+  document.getElementById('reading-deck').style.display = 'none';
+  document.getElementById('reading-question').style.display = 'block';
+}
+
+function startCardSelection() {
+  readingState.question = document.getElementById('reading-question-input').value.trim();
+  readingState.selected = [];
+
+  // 덱 생성: 78장 셔플
+  const allCards = getAllCards();
+  readingState.deck = shuffleArray(allCards);
+
+  document.getElementById('reading-question').style.display = 'none';
+  document.getElementById('reading-deck').style.display = 'block';
+
+  const sub = document.getElementById('reading-deck-sub');
+  sub.textContent = `${readingState.positionLabels[0]} 카드를 선택하세요 (${readingState.selected.length + 1}/${readingState.maxCards})`;
+
+  renderDeck();
+}
+
+function renderDeck() {
+  const deckEl = document.getElementById('reading-card-deck');
+  deckEl.innerHTML = '';
+
+  readingState.deck.forEach((card, idx) => {
+    const cardEl = document.createElement('div');
+    cardEl.className = 'deck-card';
+    cardEl.innerHTML = `<div class="deck-card-back">🂠</div>`;
+    cardEl.onclick = () => selectCard(idx);
+    deckEl.appendChild(cardEl);
+  });
+}
+
+function selectCard(idx) {
+  const card = readingState.deck[idx];
+  const reversed = Math.random() > 0.5;
+  const position = readingState.positionLabels[readingState.selected.length];
+
+  readingState.selected.push({ card, reversed, position });
+
+  // 덱에서 제거
+  readingState.deck.splice(idx, 1);
+
+  if (readingState.selected.length >= readingState.maxCards) {
+    // 리딩 완료
+    showReadingResult();
+  } else {
+    // 다음 카드
+    const sub = document.getElementById('reading-deck-sub');
+    sub.textContent = `${readingState.positionLabels[readingState.selected.length]} 카드를 선택하세요 (${readingState.selected.length + 1}/${readingState.maxCards})`;
+    renderDeck();
+    showToast(`${position} 카드 선택 완료!`, 'success');
+  }
+}
+
+function showReadingResult() {
+  document.getElementById('reading-deck').style.display = 'none';
+  const resultEl = document.getElementById('reading-result');
+  resultEl.style.display = 'block';
+
+  const spreadName = getSpreadName(readingState.spread);
+
+  let cardsHtml = readingState.selected.map((sel, i) => {
+    const { card, reversed, position } = sel;
+    const direction = reversed ? '역방향' : '정방향';
+    const meaning = reversed ? card.reversed : card.upright;
+    const imageUrl = getCardImageUrl(card);
+
+    return `
+      <div class="result-card">
+        <div class="result-card-position">${position}</div>
+        <div class="result-card-image ${reversed ? 'reversed' : ''}">
+          <img src="${imageUrl}" alt="${card.name}" onerror="this.outerHTML=createCardPlaceholder(findCardById('${card.id}'))">
+        </div>
+        <div class="result-card-info">
+          <h4>${card.name} <span class="card-name-en">${card.nameEn}</span></h4>
+          <span class="badge badge-${reversed ? 'reversed' : 'upright'}">${direction}</span>
+          <div class="card-keywords">
+            ${meaning.keywords.map(k => `<span class="keyword">${k}</span>`).join('')}
+          </div>
+          <p>${meaning.meaning}</p>
+        </div>
       </div>
     `;
-  });
+  }).join('');
 
-  // 종합 조언
-  guideHtml += `
-    <hr style="border:none;border-top:1px solid var(--border-color);margin:1rem 0;">
-    <div>
-      <h4>💡 종합 조언</h4>
-      <p style="font-size:0.9rem;">
-        카드의 메시지를 자신의 상황에 비추어 생각해 보세요.
-        정방향 카드는 해당 에너지가 잘 흐르고 있음을, 
-        역방향 카드는 그 에너지에 주의가 필요함을 의미합니다.
-        자신의 직관을 믿고, 카드가 전하는 지혜를 삶에 적용해 보세요.
-      </p>
+  // 간단한 종합 메시지
+  let summary = generateSimpleSummary(readingState.selected, readingState.spread);
+
+  resultEl.innerHTML = `
+    <div class="reading-result-box">
+      <h3>🔮 ${spreadName} 리딩 결과</h3>
+      ${readingState.question ? `<p class="result-question">질문: "${readingState.question}"</p>` : ''}
+
+      <div class="result-cards-grid">
+        ${cardsHtml}
+      </div>
+
+      <div class="result-summary">
+        <h4>📝 종합 가이드</h4>
+        <p>${summary}</p>
+      </div>
+
+      <div class="result-actions">
+        <button class="btn-ai-analysis" onclick="openAIAnalysisFromReading()">
+          🤖 AI 상세 분석
+        </button>
+        <button class="btn-secondary" onclick="saveReadingToJournal()">📖 일지에 저장</button>
+        <button class="btn-primary" onclick="initReading()">🔄 새 리딩</button>
+      </div>
     </div>
   `;
-
-  resultGuide.innerHTML = guideHtml;
 }
 
-// ============================================
-// 일지에 저장
-// ============================================
-function saveToJournal() {
-  const memoText = prompt('이 리딩에 대한 나의 해석이나 메모를 입력하세요 (선택사항):', '');
+function openAIAnalysisFromReading() {
+  openAIAnalysis(
+    readingState.spread,
+    readingState.selected,
+    readingState.question
+  );
+}
 
+function generateSimpleSummary(selected, spread) {
+  if (selected.length === 1) {
+    const { card, reversed } = selected[0];
+    const meaning = reversed ? card.reversed : card.upright;
+    return `${card.name} 카드가 ${reversed ? '역방향으로' : '정방향으로'} 나왔습니다. 핵심 키워드는 "${meaning.keywords[0]}"입니다. 이 카드의 메시지를 깊이 생각해보세요.`;
+  }
+
+  const keywords = selected.map(s => {
+    const m = s.reversed ? s.card.reversed : s.card.upright;
+    return m.keywords[0];
+  });
+
+  return `카드들의 핵심 흐름: ${keywords.join(' → ')}. 각 카드의 위치와 의미를 연결지어 해석해보세요. 더 깊은 분석이 필요하시면 AI 분석을 이용해보세요.`;
+}
+
+function saveReadingToJournal() {
   const entry = {
-    id: Date.now(),
-    date: new Date().toISOString(),
-    spreadType: currentSpreadType,
-    spreadName: getSpreadName(currentSpreadType),
-    question: currentQuestion || '',
-    cards: selectedReadingCards.map(c => ({
-      id: c.id,
-      name: c.name,
-      nameEn: c.nameEn,
-      reversed: c.reversed
+    id: 'journal-' + Date.now(),
+    spread: readingState.spread,
+    spreadName: getSpreadName(readingState.spread),
+    question: readingState.question,
+    cards: readingState.selected.map(s => ({
+      cardId: s.card.id,
+      cardName: s.card.name,
+      cardNameEn: s.card.nameEn,
+      reversed: s.reversed,
+      position: s.position
     })),
-    memo: memoText || ''
+    memo: '',
+    createdAt: new Date().toISOString()
   };
 
   const journal = JSON.parse(localStorage.getItem('tarot-journal') || '[]');
   journal.unshift(entry);
   localStorage.setItem('tarot-journal', JSON.stringify(journal));
 
-  showToast('리딩 일지에 저장되었습니다! 📝', 'success');
+  showToast('일지에 저장되었습니다!', 'success');
 }
