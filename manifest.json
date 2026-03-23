@@ -1,21 +1,43 @@
 {
   "name": "타로 학습 & 운세",
   "short_name": "타로",
-  "start_url": "./index.html",
+  "description": "78장의 타로 카드 학습과 다양한 스프레드 리딩",
+  "start_url": "/index.html",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#1a1a2e",
   "theme_color": "#1a1a2e",
-  "orientation": "portrait",
+  "lang": "ko",
+  "dir": "ltr",
+  "categories": ["lifestyle", "education"],
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "images/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "images/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "카드 리딩",
+      "short_name": "리딩",
+      "url": "/index.html?page=reading",
+      "icons": [{ "src": "images/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "카드 학습",
+      "short_name": "학습",
+      "url": "/index.html?page=study",
+      "icons": [{ "src": "images/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }

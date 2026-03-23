@@ -2,14 +2,26 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no, viewport-fit=cover">
+  
+  <!-- iOS -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="타로">
   <meta name="format-detection" content="telephone=no">
-  <meta name="theme-color" content="#1a1a2e">
-  <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="images/icon-192.png">
+  
+  <!-- Android / Chrome -->
+  <meta name="theme-color" content="#1a1a2e">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="타로">
+  
+  <!-- 공통 -->
+  <meta name="description" content="타로 카드 학습과 리딩을 위한 웹앱 - 78장의 카드가 전하는 지혜와 통찰">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="images/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="images/icon-512.png">
+  
   <title>타로 - 학습 & 리딩</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/themes/default.css" id="theme-link">
@@ -289,7 +301,7 @@
 
   </main>
 
-  <!-- AI 분석 모달 (새로 추가) -->
+  <!-- AI 분석 모달 -->
   <div id="ai-analysis-modal" class="modal hidden">
     <div class="modal-overlay" onclick="closeAIAnalysisModal()"></div>
     <div class="modal-content ai-modal-content">
