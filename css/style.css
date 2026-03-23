@@ -1516,3 +1516,90 @@ body {
 .hash-instructions a {
   color: var(--primary-color);
 }
+
+/* ============================================
+   iOS/모바일 최적화 (v1.0.2)
+   ============================================ */
+
+@supports (padding: env(safe-area-inset-top)) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  #app-header {
+    padding-top: max(0.75rem, env(safe-area-inset-top));
+  }
+  #toast-container {
+    bottom: max(2rem, env(safe-area-inset-bottom));
+    right: max(1rem, env(safe-area-inset-right));
+  }
+}
+
+.modal-content,
+.ai-result-content,
+.ai-card-selector {
+  -webkit-overflow-scrolling: touch;
+}
+
+.deck-card,
+.card-thumb,
+.feature-card,
+.spread-card,
+.journal-entry {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a, button, .btn {
+  -webkit-tap-highlight-color: rgba(108, 92, 231, 0.2);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+}
+
+@media (max-width: 768px) {
+  .nav-btn,
+  .tab-btn,
+  .btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  .nav-btn {
+    padding: 0.6rem 1rem;
+  }
+  .modal-close {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+  .deck-card {
+    min-width: 50px;
+    min-height: 75px;
+  }
+  input[type="text"],
+  input[type="password"],
+  input[type="email"],
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 896px) and (orientation: landscape) {
+  .hero {
+    padding: 1.5rem 1rem;
+  }
+  .modal-content {
+    max-height: 95vh;
+  }
+}
