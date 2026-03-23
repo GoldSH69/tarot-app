@@ -1603,3 +1603,8 @@ body {
     max-height: 95vh;
   }
 }
+
+/* 테마 변경 버튼 숨김 (v1.5 테마 완성 전까지) */
+#theme-toggle {
+    display: none !important;
+}

@@ -1,0 +1,33 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Git: 커밋 & 푸시",
+      "type": "shell",
+      "command": "git add -A && git commit -m \"${input:commitMessage}\" && git push",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Git: 빠른 푸시 (자동 메시지)",
+      "type": "shell",
+      "command": "git add -A && git commit -m \"update: $(date +%Y%m%d-%H%M%S)\" && git push",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "commitMessage",
+      "description": "커밋 메시지를 입력하세요",
+      "type": "promptString",
+      "default": "update"
+    }
+  ]
+}

@@ -1,5 +1,7 @@
 /**
  * 관리자 모듈
+ * - GIST_ID는 Cloudflare Worker 환경변수에서 관리
+ * - 프론트엔드에서는 Gist ID 입력 불필요
  */
 
 let adminPassword = '';
@@ -94,19 +96,7 @@ function adminLogout() {
 // 관리자 대시보드 초기화
 // ============================================
 function initAdminDashboard() {
-  loadSavedGistId();
   loadRequestList();
-}
-
-// ============================================
-// 저장된 Gist ID 불러오기
-// ============================================
-function loadSavedGistId() {
-  const saved = localStorage.getItem('tarot-gist-id');
-  if (saved) {
-    const input = document.getElementById('gist-id');
-    if (input) input.value = saved;
-  }
 }
 
 // ============================================
@@ -258,7 +248,6 @@ function exportAllData() {
     memos: JSON.parse(localStorage.getItem('tarot-memos') || '{}'),
     requests: JSON.parse(localStorage.getItem('tarot-requests') || '[]'),
     dailyCard: localStorage.getItem('tarot-daily-card'),
-    gistId: localStorage.getItem('tarot-gist-id'),
     exportDate: new Date().toISOString()
   };
 
@@ -280,7 +269,7 @@ function clearAllData() {
   const keysToRemove = [
     'tarot-journal', 'tarot-studied', 'tarot-bookmarks',
     'tarot-memos', 'tarot-requests', 'tarot-daily-card',
-    'tarot-gist-id', 'tarot-theme'
+    'tarot-theme'
   ];
   keysToRemove.forEach(key => localStorage.removeItem(key));
   showToast('모든 데이터가 초기화되었습니다', 'info');

@@ -13,7 +13,6 @@
       <h1 class="logo">🔮 타로 관리자</h1>
       <div class="header-actions">
         <a href="index.html" class="btn btn-secondary btn-sm">← 사용자 페이지</a>
-        <button id="theme-toggle" onclick="cycleTheme()" title="테마 변경">🎨</button>
       </div>
     </div>
   </header>
@@ -42,11 +41,11 @@
 
       <!-- 일지 동기화 탭 -->
       <div id="admin-tab-journal-sync" class="admin-tab-content active">
-        <h3>☁️ Gist 일지 동기화</h3>
-        <div class="form-group">
-          <label>Gist ID (최초 저장 시 비워두세요)</label>
-          <input type="text" id="gist-id" placeholder="Gist ID">
-        </div>
+        <h3>☁️ Gist 데이터 동기화</h3>
+        <p style="font-size:0.85rem; color:var(--text-light); margin-bottom:1rem;">
+          Gist ID는 Cloudflare Worker 환경변수(GIST_ID)에서 자동으로 관리됩니다.<br>
+          최초 저장 시 새 Gist가 생성되며, 생성된 ID를 환경변수에 등록하면 이후 자동 업데이트됩니다.
+        </p>
         <div class="sync-buttons">
           <button class="btn btn-primary" onclick="saveToGist()">☁️ Gist에 저장</button>
           <button class="btn btn-secondary" onclick="loadFromGist()">📥 Gist에서 불러오기</button>
@@ -111,6 +110,11 @@
             <button class="btn btn-secondary" onclick="exportAllData()">📦 전체 데이터 내보내기</button>
             <button class="btn btn-secondary" onclick="clearAllData()">🗑️ 전체 데이터 초기화</button>
           </div>
+        </div>
+
+        <!-- 로그아웃 -->
+        <div class="settings-section">
+          <button class="btn btn-secondary" onclick="adminLogout()">🚪 로그아웃</button>
         </div>
       </div>
     </section>
