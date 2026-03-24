@@ -11,16 +11,13 @@ let aiModalVerified = false;
 // ★ AI 분석 버튼 클릭 핸들러 (분기 처리)
 // ============================================
 function handleAIAnalysisClick() {
-  // 관리자 세션 확인 (admin.js에서 로그인 시 저장됨)
   var savedPw = sessionStorage.getItem('tarot-admin-pw');
 
   if (savedPw) {
-    // ★ 관리자: AI 분석 모달 열기
     aiModalPassword = savedPw;
     aiModalVerified = true;
     openAIAnalysisModal();
   } else {
-    // ★ 일반 사용자: 의뢰 페이지로 이동 + 질문 자동 채움
     goToRequestWithQuestion();
   }
 }
@@ -29,11 +26,9 @@ function handleAIAnalysisClick() {
 // 일반 사용자 → 의뢰 페이지로 이동
 // ============================================
 function goToRequestWithQuestion() {
-  // 현재 리딩 정보를 의뢰 폼에 채우기
   var question = currentQuestion || '';
   var spreadName = getSpreadName(currentSpreadType) || '';
 
-  // 카드 정보 텍스트
   var cardInfo = '';
   if (selectedReadingCards && selectedReadingCards.length > 0) {
     var labels = getPositionLabels(currentSpreadType);
@@ -46,10 +41,8 @@ function goToRequestWithQuestion() {
     }
   }
 
-  // 의뢰 페이지로 이동
   navigateTo('request');
 
-  // 약간의 지연 후 폼에 데이터 채우기
   setTimeout(function() {
     var questionInput = document.getElementById('request-question');
     var spreadSelect = document.getElementById('request-spread');
@@ -62,14 +55,16 @@ function goToRequestWithQuestion() {
       questionInput.value = autoText;
     }
 
+    // ★ 버그 수정: select value를 실제 option value에 맞춤
     if (spreadSelect && currentSpreadType) {
-      // 스프레드 타입 매칭 시도
       if (currentSpreadType === 'one-card') {
-        spreadSelect.value = '원카드';
+        spreadSelect.value = 'one-card';
       } else if (currentSpreadType.startsWith('three-')) {
-        spreadSelect.value = '쓰리카드';
+        spreadSelect.value = 'three-card';
+      } else if (currentSpreadType === 'celtic-cross') {
+        spreadSelect.value = 'celtic-cross';
       } else {
-        spreadSelect.value = '전문가 추천';
+        spreadSelect.value = '';
       }
     }
   }, 300);
@@ -84,7 +79,6 @@ function openAIAnalysisModal() {
   var modal = document.getElementById('ai-analysis-modal');
   modal.classList.remove('hidden');
 
-  // 관리자 세션이 있으면 바로 프롬프트로
   if (aiModalVerified && aiModalPassword) {
     showAIPromptStep();
   } else {
@@ -184,6 +178,27 @@ function buildPromptFromCurrentReading() {
     cardKeywords += '  ' + card.name + '(' + direction + '): ' + kw + '\n';
   }
 
+  // ★ 켈틱크로스 전용 분석 지시 추가
+  var analysisInstructions = '';
+  if (spreadType === 'celtic-cross') {
+    analysisInstructions =
+      '=== 분석 요청 (켈틱크로스 10장) ===\n' +
+      '1. 중심부 분석 (카드 ①②): 현재 상황과 핵심 도전을 해석해 주세요.\n' +
+      '2. 수직축 분석 (카드 ③④): 의식적 목표와 무의식적 기반의 관계를 설명해 주세요.\n' +
+      '3. 시간축 분석 (카드 ⑤⑥): 과거의 영향과 다가올 에너지의 흐름을 해석해 주세요.\n' +
+      '4. 기둥 분석 (카드 ⑦⑧⑨⑩): 자신의 태도, 환경, 희망/두려움, 최종 결과를 심층 해석해 주세요.\n' +
+      '5. 전체 흐름: 10장의 카드가 하나의 이야기로 어떻게 연결되는지 설명해 주세요.\n' +
+      '6. 핵심 조언: 최종 결과(⑩)를 긍정적으로 이끌기 위한 구체적 행동 가이드를 제공해 주세요.\n' +
+      '7. 긍정적이고 건설적인 마무리 메시지를 포함해 주세요.\n';
+  } else {
+    analysisInstructions =
+      '=== 분석 요청 ===\n' +
+      '1. 각 카드의 위치별 의미를 해석해 주세요.\n' +
+      '2. 카드들 간의 관계와 전체적인 흐름을 설명해 주세요.\n' +
+      '3. 질문에 대한 구체적인 조언을 제공해 주세요.\n' +
+      '4. 긍정적이고 건설적인 마무리 메시지를 포함해 주세요.\n';
+  }
+
   return '당신은 20년 이상의 경력을 가진 전문 타로 리더입니다.\n' +
     '따뜻하고 통찰력 있는 해석을 제공해 주세요.\n\n' +
     '=== 질문 ===\n' +
@@ -194,11 +209,7 @@ function buildPromptFromCurrentReading() {
     cardDetails + '\n' +
     '=== 카드 키워드 참고 ===\n' +
     cardKeywords + '\n' +
-    '=== 분석 요청 ===\n' +
-    '1. 각 카드의 위치별 의미를 해석해 주세요.\n' +
-    '2. 카드들 간의 관계와 전체적인 흐름을 설명해 주세요.\n' +
-    '3. 질문에 대한 구체적인 조언을 제공해 주세요.\n' +
-    '4. 긍정적이고 건설적인 마무리 메시지를 포함해 주세요.\n\n' +
+    analysisInstructions + '\n' +
     '한국어로 작성하고, 마크다운 형식(##, **, - 등)을 사용해 주세요.\n' +
     '"AI"나 "인공지능"이라는 단어는 절대 사용하지 마세요.\n' +
     '전문 타로 리더의 관점에서 자연스럽게 해석해 주세요.';

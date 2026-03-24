@@ -192,24 +192,39 @@ function formatDate(dateStr) {
   });
 }
 
+// ★ 켈틱크로스 추가
 function getSpreadName(type) {
   const names = {
     'one-card': '원카드',
     'three-past-present-future': '쓰리카드: 과거-현재-미래',
     'three-situation-obstacle-advice': '쓰리카드: 상황-장애물-조언',
     'three-mind-action-result': '쓰리카드: 마음-행동-결과',
-    'spirit-tarot': '영타로'
+    'spirit-tarot': '영타로',
+    'celtic-cross': '켈틱크로스'
   };
   return names[type] || type;
 }
 
+// ★ 켈틱크로스 10포지션 라벨 추가
 function getPositionLabels(spreadType) {
   const labels = {
     'one-card': ['현재 상황/답변'],
     'three-past-present-future': ['과거', '현재', '미래'],
     'three-situation-obstacle-advice': ['상황', '장애물', '조언'],
     'three-mind-action-result': ['마음', '행동', '결과'],
-    'spirit-tarot': ['첫 번째 메시지', '두 번째 메시지', '세 번째 메시지']
+    'spirit-tarot': ['첫 번째 메시지', '두 번째 메시지', '세 번째 메시지'],
+    'celtic-cross': [
+      '① 현재 상황',
+      '② 도전/장애',
+      '③ 의식/목표',
+      '④ 무의식/기반',
+      '⑤ 과거',
+      '⑥ 가까운 미래',
+      '⑦ 자신의 태도',
+      '⑧ 주변 환경',
+      '⑨ 희망과 두려움',
+      '⑩ 최종 결과'
+    ]
   };
   return labels[spreadType] || ['카드'];
 }

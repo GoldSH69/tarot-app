@@ -1754,3 +1754,327 @@ a, button, .btn {
 #theme-toggle {
   display: none !important;
 }
+
+/* ============================================
+   켈틱크로스 레이아웃 (v1.5)
+   ============================================ */
+
+/* ---- 전체 레이아웃 컨테이너 ---- */
+.celtic-cross-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem 0;
+}
+
+/* 태블릿/PC: 십자 + 기둥 가로 배치 */
+@media (min-width: 769px) {
+  .celtic-cross-layout {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 3rem;
+  }
+}
+
+/* ---- 십자 영역 ---- */
+.celtic-cross-section {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  grid-template-rows: auto auto auto;
+  gap: 0.5rem;
+  justify-items: center;
+  align-items: center;
+  position: relative;
+}
+
+/* 십자 배치: 3열 3행 그리드 */
+/* 행1: _  ③  _ */
+/* 행2: ⑤ ①② ⑥ */
+/* 행3: _  ④  _ */
+
+.celtic-pos-top {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.celtic-pos-left {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.celtic-pos-center {
+  grid-column: 2;
+  grid-row: 2;
+  z-index: 2;
+}
+
+.celtic-pos-crossing {
+  grid-column: 2;
+  grid-row: 2;
+  z-index: 3;
+  position: relative;
+}
+
+.celtic-pos-right {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.celtic-pos-bottom {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+/* ---- 중앙 겹침 스택 (1번 + 2번) ---- */
+.celtic-center-stack {
+  grid-column: 2;
+  grid-row: 2;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 90px;
+  height: 130px;
+}
+
+.celtic-center-stack .celtic-pos-center {
+  position: relative;
+  z-index: 2;
+  grid-column: auto;
+  grid-row: auto;
+}
+
+.celtic-center-stack .celtic-pos-crossing {
+  position: absolute;
+  z-index: 3;
+  grid-column: auto;
+  grid-row: auto;
+}
+
+/* ---- 기둥 영역 (7~10, 아래→위) ---- */
+.celtic-pillar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* 모바일: 기둥을 가로 배치 */
+@media (max-width: 768px) {
+  .celtic-pillar-section {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+}
+
+/* ---- 개별 카드 아이템 ---- */
+.celtic-card-item {
+  text-align: center;
+  width: 80px;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+.celtic-card-label {
+  font-size: 0.65rem;
+  color: var(--primary-color);
+  font-weight: 600;
+  margin-bottom: 0.15rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.celtic-card-img {
+  width: 70px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px var(--shadow-color);
+  transition: transform 0.2s;
+}
+
+.celtic-card-img:hover {
+  transform: scale(1.05);
+}
+
+.celtic-card-img.reversed {
+  transform: rotate(180deg);
+}
+
+.celtic-card-img.reversed:hover {
+  transform: rotate(180deg) scale(1.05);
+}
+
+/* 2번 카드: 가로로 겹침 (90도 회전) */
+.celtic-crossing-img {
+  transform: rotate(90deg);
+  position: relative;
+}
+
+/* 2번 카드가 역방향인 경우: 90도 + 180도 = 270도 */
+.celtic-crossing-reversed {
+  transform: rotate(270deg);
+}
+
+.celtic-card-name {
+  font-size: 0.65rem;
+  font-weight: 500;
+  margin-top: 0.15rem;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.celtic-card-direction {
+  font-size: 0.6rem;
+  color: var(--text-light);
+}
+
+/* ---- 기둥 카드 순서 (flex order로 아래→위) ---- */
+.celtic-pillar-1 { order: 4; } /* ⑦ 자신 (하단) */
+.celtic-pillar-2 { order: 3; } /* ⑧ 환경 */
+.celtic-pillar-3 { order: 2; } /* ⑨ 희망 */
+.celtic-pillar-4 { order: 1; } /* ⑩ 결과 (상단) */
+
+/* 모바일에서는 좌→우로 (order 초기화) */
+@media (max-width: 768px) {
+  .celtic-pillar-1 { order: 1; }
+  .celtic-pillar-2 { order: 2; }
+  .celtic-pillar-3 { order: 3; }
+  .celtic-pillar-4 { order: 4; }
+}
+
+/* ---- 켈틱크로스 반응형 크기 조정 ---- */
+@media (min-width: 769px) {
+  .celtic-card-item {
+    width: 100px;
+  }
+  .celtic-card-img {
+    width: 85px;
+  }
+  .celtic-card-label {
+    font-size: 0.7rem;
+  }
+  .celtic-card-name {
+    font-size: 0.7rem;
+  }
+  .celtic-center-stack {
+    width: 110px;
+    height: 155px;
+  }
+}
+
+@media (max-width: 480px) {
+  .celtic-card-item {
+    width: 65px;
+  }
+  .celtic-card-img {
+    width: 55px;
+  }
+  .celtic-card-label {
+    font-size: 0.55rem;
+  }
+  .celtic-card-name {
+    font-size: 0.55rem;
+  }
+  .celtic-card-direction {
+    font-size: 0.5rem;
+  }
+  .celtic-center-stack {
+    width: 70px;
+    height: 105px;
+  }
+  .celtic-cross-section {
+    gap: 0.25rem;
+  }
+}
+
+/* ============================================
+   켈틱크로스 안내 박스 (질문 입력 화면)
+   ============================================ */
+.celtic-guide-box {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1rem auto 1.5rem;
+  max-width: 600px;
+  text-align: left;
+}
+
+.celtic-guide-box h4 {
+  color: var(--primary-color);
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+}
+
+.celtic-guide-box > p {
+  font-size: 0.9rem;
+  color: var(--text-light);
+  margin-bottom: 0.75rem;
+}
+
+.celtic-positions-guide {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 0.75rem 0;
+}
+
+@media (max-width: 480px) {
+  .celtic-positions-guide {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}
+
+.celtic-guide-group strong {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--primary-color);
+  margin-bottom: 0.4rem;
+}
+
+.celtic-guide-group ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.celtic-guide-group li {
+  font-size: 0.8rem;
+  color: var(--text-color);
+  margin-bottom: 0.25rem;
+  padding-left: 0.5rem;
+  line-height: 1.5;
+}
+
+.celtic-guide-tip {
+  font-size: 0.8rem;
+  color: var(--primary-color);
+  font-style: italic;
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(108, 92, 231, 0.05);
+  border-radius: 6px;
+}
+
+/* ============================================
+   의뢰 면책 문구
+   ============================================ */
+.request-disclaimer {
+  font-size: 0.75rem;
+  color: var(--text-light);
+  text-align: center;
+  margin-top: 1rem;
+  line-height: 1.6;
+  padding: 0.75rem;
+  background: rgba(108, 92, 231, 0.03);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
