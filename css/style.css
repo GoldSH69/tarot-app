@@ -2078,3 +2078,239 @@ a, button, .btn {
   border-radius: 8px;
   border: 1px solid var(--border-color);
 }
+
+/* ============================================
+   무료 AI 분석 결과 스타일 (v1.5)
+   ============================================ */
+
+/* ---- AI 섹션 설명 텍스트 ---- */
+.ai-section-desc {
+  font-size: 0.8rem;
+  color: var(--text-light);
+  margin-top: 0.5rem;
+}
+
+/* ---- 무료 횟수 표시 ---- */
+.ai-free-count {
+  font-weight: 600;
+  margin-left: 0.25rem;
+}
+
+.ai-free-count.available {
+  color: #00b894;
+}
+
+.ai-free-count.exhausted {
+  color: #d63031;
+}
+
+/* ---- 무료 분석 로딩 ---- */
+.ai-free-loading {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.ai-free-loading .loading-spinner {
+  width: 36px;
+  height: 36px;
+  border-width: 3px;
+  margin: 0 auto 1rem;
+}
+
+.ai-free-loading p {
+  color: var(--primary-color);
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+/* ---- 무료 분석 결과 (인라인) ---- */
+.ai-free-result {
+  background: var(--card-bg);
+  border: 1px solid var(--primary-color);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.ai-free-result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: linear-gradient(135deg, rgba(108, 92, 231, 0.08), rgba(162, 155, 254, 0.08));
+  border-bottom: 1px solid var(--border-color);
+}
+
+.ai-free-result-header h4 {
+  color: var(--primary-color);
+  font-size: 1rem;
+  margin: 0;
+}
+
+.ai-free-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  background: rgba(0, 184, 148, 0.12);
+  color: #00b894;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.ai-free-result-body {
+  padding: 1.25rem;
+  line-height: 1.8;
+  max-height: 500px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.ai-free-result-footer {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--border-color);
+  background: rgba(108, 92, 231, 0.02);
+}
+
+.ai-free-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+/* ---- AI 면책 문구 (인라인 결과 내) ---- */
+.ai-disclaimer {
+  font-size: 0.7rem;
+  color: var(--text-light);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ---- 무료 분석 횟수 초과 안내 ---- */
+.ai-limit-notice {
+  text-align: center;
+  padding: 2rem 1.5rem;
+}
+
+.ai-limit-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.ai-limit-notice h4 {
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.ai-limit-notice p {
+  font-size: 0.9rem;
+  color: var(--text-light);
+  line-height: 1.6;
+  margin-bottom: 0.5rem;
+}
+
+.ai-limit-divider {
+  width: 60px;
+  height: 2px;
+  background: var(--border-color);
+  margin: 1rem auto;
+}
+
+/* ---- 의뢰 면책 문구 (v1.5 강화) ---- */
+.request-disclaimer {
+  font-size: 0.75rem;
+  color: var(--text-light);
+  margin-top: 1.25rem;
+  line-height: 1.6;
+  padding: 1rem 1.25rem;
+  background: rgba(108, 92, 231, 0.03);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.request-disclaimer p {
+  margin-bottom: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.request-disclaimer ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.request-disclaimer li {
+  position: relative;
+  padding-left: 1rem;
+  margin-bottom: 0.3rem;
+  font-size: 0.75rem;
+}
+
+.request-disclaimer li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--text-light);
+}
+
+/* ---- 의뢰 가격 정보 ---- */
+.request-price-info {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, rgba(108, 92, 231, 0.08), rgba(162, 155, 254, 0.05));
+  border-radius: 8px;
+  border: 1px solid rgba(108, 92, 231, 0.15);
+}
+
+.request-price-info p {
+  font-size: 0.85rem;
+  color: var(--primary-color);
+  font-weight: 500;
+  text-align: center;
+  margin: 0;
+}
+
+/* ---- 반응형: 무료 AI 결과 ---- */
+@media (max-width: 768px) {
+  .ai-free-result-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .ai-free-result-body {
+    padding: 1rem;
+    max-height: 400px;
+  }
+
+  .ai-free-result-footer {
+    padding: 0.75rem 1rem;
+  }
+
+  .ai-free-actions {
+    flex-direction: column;
+  }
+
+  .ai-free-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .ai-limit-notice {
+    padding: 1.5rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .ai-free-result-body {
+    max-height: 350px;
+    font-size: 0.85rem;
+  }
+
+  .request-price-info p {
+    font-size: 0.75rem;
+  }
+}

@@ -78,7 +78,7 @@
         <div class="feature-card" onclick="navigateTo('request')">
           <span class="feature-icon">📮</span>
           <h3>전문 상담 의뢰</h3>
-          <p>AI 기반 타로 전문 분석을 받아보세요</p>
+          <p>전문가 감수 AI 분석을 받아보세요</p>
         </div>
       </div>
       <div class="daily-card-section">
@@ -129,7 +129,7 @@
         <h2>🃏 카드 리딩</h2>
       </div>
 
-      <!-- ★ 스프레드 선택 (켈틱크로스 추가) -->
+      <!-- 스프레드 선택 (켈틱크로스 포함) -->
       <div id="spread-selection" class="spread-grid">
         <div class="spread-card" onclick="startReading('one-card')">
           <span class="spread-icon">🎴</span>
@@ -177,7 +177,7 @@
       <div id="question-input-section" class="hidden">
         <h3 id="selected-spread-name"></h3>
 
-        <!-- ★ 켈틱크로스 안내 박스 -->
+        <!-- 켈틱크로스 안내 박스 -->
         <div id="celtic-guide-in-question" class="celtic-guide-box hidden">
           <h4>✝️ 켈틱크로스 안내</h4>
           <p>켈틱크로스는 가장 전통적이고 포괄적인 10장 스프레드입니다.</p>
@@ -274,13 +274,14 @@
         <div id="result-cards" class="result-cards"></div>
         <div id="result-guide" class="result-guide"></div>
         
-        <!-- AI 분석 섹션 -->
+        <!-- ★ AI 분석 섹션 (무료 1회/일 + 관리자 무제한) -->
         <div id="ai-analysis-section" class="ai-analysis-section">
           <button class="btn btn-primary btn-lg" onclick="handleAIAnalysisClick()">
             🔮 AI 전문가 분석 받기
           </button>
-          <p style="font-size:0.8rem; color:var(--text-light); margin-top:0.5rem;">
-            AI가 타로 전통 해석을 바탕으로 더 깊은 분석을 제공합니다
+          <p class="ai-section-desc">
+            AI가 타로 전통 해석을 바탕으로 분석합니다
+            <span id="ai-free-remaining" class="ai-free-count"></span>
           </p>
         </div>
         
@@ -311,50 +312,60 @@
       </div>
       <div class="request-content">
         <div class="request-info">
-          <h3>🌟 AI 기반 타로 전문 분석</h3>
-          <p>타로 전통 해석을 기반으로<br>AI가 깊이 있는 분석 결과를 제공합니다.</p>
+          <h3>🌟 전문가 감수 AI 분석 서비스</h3>
+          <p>타로 전통 해석 기반 AI 분석 결과를<br>전문가가 검토·감수하여 이메일로 발송합니다.</p>
           <ul class="request-features">
-            <li>✅ 상세한 카드 해석</li>
-            <li>✅ 카드 간 관계 분석</li>
-            <li>✅ 구체적인 조언과 가이드</li>
+            <li>✅ 심층 카드 해석 (무료 분석보다 상세)</li>
+            <li>✅ 카드 간 관계 및 흐름 분석</li>
+            <li>✅ 구체적 행동 가이드 포함</li>
             <li>✅ 전문가 감수 후 이메일 발송</li>
+            <li>✅ 이메일 1회 후속 질문 가능</li>
           </ul>
+          <div class="request-price-info">
+            <p>💰 원카드: 5,000원 | 쓰리카드: 8,000원 | 켈틱크로스: 15,000원</p>
+          </div>
         </div>
         <form id="request-form" class="request-form" onsubmit="submitRequest(event)">
           <div class="form-group">
-            <label>이메일 주소</label>
+            <label>이메일 주소 *</label>
             <input type="email" id="request-email" required placeholder="회신 받으실 이메일">
           </div>
           <div class="form-group">
-            <label>질문 내용</label>
+            <label>질문 내용 *</label>
             <textarea id="request-question" rows="4" required placeholder="궁금한 내용을 자세히 적어주세요"></textarea>
           </div>
           <div class="form-group">
             <label>선호하는 스프레드 (선택)</label>
             <select id="request-spread">
               <option value="">전문가에게 맡기기</option>
-              <option value="one-card">원카드</option>
-              <option value="three-card">쓰리카드</option>
-              <option value="celtic-cross">켈틱크로스</option>
+              <option value="one-card">원카드 (5,000원)</option>
+              <option value="three-card">쓰리카드 (8,000원)</option>
+              <option value="celtic-cross">켈틱크로스 (15,000원)</option>
             </select>
           </div>
           <button type="submit" class="btn btn-primary btn-lg">📮 의뢰 전송</button>
-          <p class="request-disclaimer">
-            본 서비스는 AI 기반 타로 카드 분석 서비스입니다.
-            분석 결과는 참고용이며, 의료·법률·재정 등 전문 분야의 조언을 대체하지 않습니다.
-          </p>
+          <div class="request-disclaimer">
+            <p><strong>📋 서비스 안내</strong></p>
+            <ul>
+              <li>본 서비스는 AI 기반 타로 카드 분석 서비스입니다.</li>
+              <li>전문 상담사의 직접 상담이 아닌, AI가 생성한 해석 결과를 전문가가 감수하여 제공합니다.</li>
+              <li>분석 결과는 자기성찰을 위한 참고용이며, 의료·법률·재정 등 전문 분야의 조언을 대체하지 않습니다.</li>
+              <li>결제 후 제공되는 콘텐츠 특성상 환불이 제한될 수 있습니다.</li>
+              <li>동일한 질문·카드 조합의 재열람은 추가 비용 없이 제공됩니다.</li>
+            </ul>
+          </div>
         </form>
       </div>
     </section>
 
   </main>
 
-  <!-- AI 분석 모달 -->
+  <!-- AI 분석 모달 (관리자 전용) -->
   <div id="ai-analysis-modal" class="modal hidden">
     <div class="modal-overlay" onclick="closeAIAnalysisModal()"></div>
     <div class="modal-content ai-modal-content">
       <button class="modal-close" onclick="closeAIAnalysisModal()">✕</button>
-      <h3>🤖 AI 전문가 분석</h3>
+      <h3>🤖 AI 전문가 분석 (관리자)</h3>
       
       <!-- STEP 1: 비밀번호 입력 -->
       <div id="ai-step-password" class="ai-step">
@@ -413,5 +424,32 @@
   <script src="js/spirit-tarot.js"></script>
   <script src="js/journal.js"></script>
   <script src="js/gemini.js"></script>
+
+  <!-- ★ 페이지 로드 시 무료 AI 남은 횟수 표시 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      updateFreeAICount();
+    });
+
+    function updateFreeAICount() {
+      var el = document.getElementById('ai-free-remaining');
+      if (!el) return;
+      var today = new Date().toDateString();
+      var saved = localStorage.getItem('tarot-ai-usage');
+      var count = 0;
+      if (saved) {
+        var data = JSON.parse(saved);
+        if (data.date === today) count = data.count || 0;
+      }
+      var remaining = Math.max(0, 1 - count);
+      if (remaining > 0) {
+        el.textContent = '(무료 ' + remaining + '회 남음)';
+        el.className = 'ai-free-count available';
+      } else {
+        el.textContent = '(오늘 무료 분석 소진)';
+        el.className = 'ai-free-count exhausted';
+      }
+    }
+  </script>
 </body>
 </html>

@@ -1,25 +1,245 @@
 /**
  * Gemini AI 분석 모듈
- * - 관리자 세션 있음 → AI 분석 모달
- * - 일반 사용자 → 의뢰 페이지로 이동
+ * - 관리자 세션 있음 → AI 분석 모달 (제한 없음)
+ * - 일반 사용자 → 무료 1회/일 AI 분석 또는 의뢰 안내
  */
 
 let aiModalPassword = '';
 let aiModalVerified = false;
 
 // ============================================
-// ★ AI 분석 버튼 클릭 핸들러 (분기 처리)
+// ★ AI 분석 버튼 클릭 핸들러 (3단 분기)
 // ============================================
 function handleAIAnalysisClick() {
   var savedPw = sessionStorage.getItem('tarot-admin-pw');
 
   if (savedPw) {
+    // ★ 관리자: AI 분석 모달 (제한 없음)
     aiModalPassword = savedPw;
     aiModalVerified = true;
     openAIAnalysisModal();
   } else {
-    goToRequestWithQuestion();
+    // ★ 일반 사용자: 무료 분석 시도
+    handleFreeAIAnalysis();
   }
+}
+
+// ============================================
+// ★ 무료 AI 분석 (1회/일)
+// ============================================
+function handleFreeAIAnalysis() {
+  var usage = getFreeAIUsage();
+
+  if (usage.count >= 1) {
+    // 이미 사용함 → 의뢰 안내
+    showFreeAILimitModal();
+  } else {
+    // 무료 분석 실행
+    executeFreeAIAnalysis();
+  }
+}
+
+// 오늘 사용 횟수 확인
+function getFreeAIUsage() {
+  var today = new Date().toDateString();
+  var saved = localStorage.getItem('tarot-ai-usage');
+  if (saved) {
+    var data = JSON.parse(saved);
+    if (data.date === today) {
+      return { date: today, count: data.count || 0 };
+    }
+  }
+  return { date: today, count: 0 };
+}
+
+// 사용 횟수 저장
+function saveFreeAIUsage() {
+  var today = new Date().toDateString();
+  var usage = getFreeAIUsage();
+  localStorage.setItem('tarot-ai-usage', JSON.stringify({
+    date: today,
+    count: usage.count + 1
+  }));
+}
+
+// ============================================
+// ★ 무료 분석 실행
+// ============================================
+async function executeFreeAIAnalysis() {
+  var prompt = buildFreePrompt();
+
+  if (!prompt) {
+    showToast('분석할 카드 정보가 없습니다.', 'error');
+    return;
+  }
+
+  // UI 업데이트: 버튼 → 로딩 상태
+  var section = document.getElementById('ai-analysis-section');
+  section.innerHTML =
+    '<div class="ai-free-loading">' +
+    '  <div class="loading-spinner"></div>' +
+    '  <p>🔮 AI가 카드를 분석하고 있습니다...</p>' +
+    '  <p style="font-size:0.8rem; color:var(--text-light);">약 5~10초 소요됩니다</p>' +
+    '</div>';
+
+  try {
+    var response = await fetch(WORKER_URL + '/api/ai/analyze-free', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: prompt })
+    });
+
+    var data = await response.json();
+
+    if (data.success) {
+      // 성공 → 사용 횟수 저장
+      saveFreeAIUsage();
+
+      // 결과 인라인 표시
+      section.innerHTML =
+        '<div class="ai-free-result">' +
+        '  <div class="ai-free-result-header">' +
+        '    <h4>🔮 AI 분석 결과</h4>' +
+        '    <span class="ai-free-badge">무료 분석</span>' +
+        '  </div>' +
+        '  <div class="ai-free-result-body">' + formatMarkdown(data.analysis) + '</div>' +
+        '  <div class="ai-free-result-footer">' +
+        '    <p class="ai-disclaimer">' +
+        '      본 분석은 AI가 타로 전통 해석을 바탕으로 생성한 참고용 결과입니다.<br>' +
+        '      의료·법률·재정 등 전문 분야의 조언을 대체하지 않습니다.' +
+        '    </p>' +
+        '    <div class="ai-free-actions">' +
+        '      <button class="btn btn-secondary btn-sm" onclick="copyFreeAIResult()">📋 결과 복사</button>' +
+        '      <button class="btn btn-primary btn-sm" onclick="goToRequestFromFree()">💎 더 깊은 전문 분석 받기</button>' +
+        '    </div>' +
+        '  </div>' +
+        '</div>';
+
+      showToast('AI 분석이 완료되었습니다! ✨', 'success');
+    } else {
+      // 실패 → 원래 버튼 복원
+      restoreAISection('분석 실패: ' + (data.error || '알 수 없는 오류'));
+      showToast('AI 분석에 실패했습니다.', 'error');
+    }
+  } catch (err) {
+    restoreAISection('서버 연결 실패');
+    showToast('서버 연결에 실패했습니다: ' + err.message, 'error');
+  }
+}
+
+// ============================================
+// 무료 분석용 프롬프트 생성 (간결 버전)
+// ============================================
+function buildFreePrompt() {
+  var cards = selectedReadingCards || [];
+  var spreadType = currentSpreadType || 'one-card';
+  var question = currentQuestion || '';
+
+  if (cards.length === 0) return null;
+
+  var positionLabels = getPositionLabels(spreadType);
+
+  var cardDetails = '';
+  var cardKeywords = '';
+
+  for (var i = 0; i < cards.length; i++) {
+    var card = cards[i];
+    var isRev = card.isReversed;
+    var direction = isRev ? '역방향' : '정방향';
+    var label = card.isJumpCard ? '🌟 점프카드' : (positionLabels[i] || '카드 ' + (i + 1));
+
+    cardDetails += '[' + label + '] ' + card.name + ' (' + (card.nameEn || '') + ') — ' + direction + '\n';
+
+    var meaning = isRev ? card.reversedData : card.uprightData;
+    if (!meaning || !meaning.keywords) {
+      var orig = findCardById(card.id);
+      if (orig) meaning = isRev ? orig.reversed : orig.upright;
+    }
+    var kw = (meaning && meaning.keywords) ? meaning.keywords.join(', ') : '';
+    cardKeywords += '  ' + card.name + '(' + direction + '): ' + kw + '\n';
+  }
+
+  return '당신은 따뜻하고 통찰력 있는 전문 타로 리더입니다.\n\n' +
+    '=== 질문 ===\n' +
+    (question || '오늘의 운세/메시지를 알고 싶습니다.') + '\n\n' +
+    '=== 스프레드 ===\n' +
+    getSpreadName(spreadType) + '\n\n' +
+    '=== 카드 ===\n' +
+    cardDetails + '\n' +
+    '=== 키워드 참고 ===\n' +
+    cardKeywords + '\n' +
+    '=== 분석 요청 ===\n' +
+    '1. 각 카드의 위치별 의미를 간결하게 해석해 주세요.\n' +
+    '2. 전체적인 흐름과 메시지를 설명해 주세요.\n' +
+    '3. 질문에 대한 핵심 조언을 제공해 주세요.\n' +
+    '4. 따뜻한 마무리 메시지를 포함해 주세요.\n\n' +
+    '한국어로 작성하고, 마크다운 형식(##, **, - 등)을 사용해 주세요.';
+}
+
+// ============================================
+// AI 섹션 복원 (에러 시)
+// ============================================
+function restoreAISection(errorMsg) {
+  var section = document.getElementById('ai-analysis-section');
+  var usage = getFreeAIUsage();
+  var remaining = Math.max(0, 1 - usage.count);
+
+  section.innerHTML =
+    '<button class="btn btn-primary btn-lg" onclick="handleAIAnalysisClick()">' +
+    '  🔮 AI 전문가 분석 받기' +
+    '</button>' +
+    '<p style="font-size:0.8rem; color:var(--text-light); margin-top:0.5rem;">' +
+    '  AI가 타로 전통 해석을 바탕으로 분석합니다 (오늘 ' + remaining + '회 남음)' +
+    '</p>' +
+    (errorMsg ? '<p class="error-text" style="margin-top:0.5rem;">⚠️ ' + errorMsg + '</p>' : '');
+}
+
+// ============================================
+// ★ 무료 분석 횟수 초과 시 안내 모달
+// ============================================
+function showFreeAILimitModal() {
+  var section = document.getElementById('ai-analysis-section');
+  section.innerHTML =
+    '<div class="ai-limit-notice">' +
+    '  <div class="ai-limit-icon">🌙</div>' +
+    '  <h4>오늘의 무료 AI 분석을 이미 사용했습니다</h4>' +
+    '  <p>무료 AI 분석은 하루 1회 제공됩니다.<br>내일 다시 이용하실 수 있습니다.</p>' +
+    '  <div class="ai-limit-divider"></div>' +
+    '  <p style="font-size:0.85rem;">더 깊고 전문적인 분석이 필요하신가요?</p>' +
+    '  <button class="btn btn-primary" onclick="goToRequestFromFree()">' +
+    '    💎 전문 상담 의뢰하기' +
+    '  </button>' +
+    '  <button class="btn btn-secondary btn-sm" style="margin-top:0.5rem;" onclick="restoreAISection(\'\')">' +
+    '    닫기' +
+    '  </button>' +
+    '</div>';
+}
+
+// ============================================
+// 무료 결과 복사
+// ============================================
+function copyFreeAIResult() {
+  var body = document.querySelector('.ai-free-result-body');
+  if (!body) return;
+  var text = body.innerText;
+  navigator.clipboard.writeText(text).then(function() {
+    showToast('분석 결과가 복사되었습니다', 'success');
+  }).catch(function() {
+    var textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    showToast('분석 결과가 복사되었습니다', 'success');
+  });
+}
+
+// ============================================
+// 무료 분석 결과에서 의뢰 페이지로 이동
+// ============================================
+function goToRequestFromFree() {
+  goToRequestWithQuestion();
 }
 
 // ============================================
@@ -27,7 +247,6 @@ function handleAIAnalysisClick() {
 // ============================================
 function goToRequestWithQuestion() {
   var question = currentQuestion || '';
-  var spreadName = getSpreadName(currentSpreadType) || '';
 
   var cardInfo = '';
   if (selectedReadingCards && selectedReadingCards.length > 0) {
@@ -55,7 +274,6 @@ function goToRequestWithQuestion() {
       questionInput.value = autoText;
     }
 
-    // ★ 버그 수정: select value를 실제 option value에 맞춤
     if (spreadSelect && currentSpreadType) {
       if (currentSpreadType === 'one-card') {
         spreadSelect.value = 'one-card';
@@ -69,7 +287,7 @@ function goToRequestWithQuestion() {
     }
   }, 300);
 
-  showToast('전문가 분석을 의뢰해 보세요! ✨', 'info');
+  showToast('전문 상담을 의뢰해 보세요! ✨', 'info');
 }
 
 // ============================================
@@ -178,7 +396,7 @@ function buildPromptFromCurrentReading() {
     cardKeywords += '  ' + card.name + '(' + direction + '): ' + kw + '\n';
   }
 
-  // ★ 켈틱크로스 전용 분석 지시 추가
+  // 켈틱크로스 전용 분석 지시
   var analysisInstructions = '';
   if (spreadType === 'celtic-cross') {
     analysisInstructions =
@@ -230,7 +448,7 @@ function copyAIPrompt() {
 }
 
 // ============================================
-// STEP 3: AI 분석 실행
+// STEP 3: AI 분석 실행 (관리자)
 // ============================================
 async function executeAIAnalysis() {
   var prompt = document.getElementById('ai-prompt-preview').value;
@@ -270,7 +488,7 @@ async function executeAIAnalysis() {
 }
 
 // ============================================
-// 결과 복사
+// 결과 복사 (관리자 모달)
 // ============================================
 function copyAIModalResult() {
   var content = document.getElementById('ai-modal-result');
