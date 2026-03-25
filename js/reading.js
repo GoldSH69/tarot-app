@@ -180,8 +180,8 @@ function showReadingResult() {
   document.getElementById('spirit-tarot-area').classList.add('hidden');
   document.getElementById('reading-result').classList.remove('hidden');
 
-  setLastReadingResult(currentSpreadType, selectedCards, document.getElementById('reading-question')?.value || '');
-  
+  setLastReadingResult(currentSpreadType, selectedReadingCards, document.getElementById('reading-question')?.value || '');
+
   var resultCards = document.getElementById('result-cards');
   var resultGuide = document.getElementById('result-guide');
   var labels = getPositionLabels(currentSpreadType);
