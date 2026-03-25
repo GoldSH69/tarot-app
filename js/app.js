@@ -4,9 +4,34 @@
  */
 
 // ============================================
-// ★★★ Cloudflare Worker URL — 여기만 수정! ★★★
+// ★★★ API 서버 URL ★★★
 // ============================================
 const WORKER_URL = 'https://tarot-server-gcql.onrender.com';
+
+// ============================================
+// 최근 리딩 결과 저장 (의뢰 페이지 연동)
+// ============================================
+let lastReadingResult = null;
+
+function setLastReadingResult(spreadType, cards, question) {
+  lastReadingResult = {
+    spreadType,
+    cards,
+    question,
+    timestamp: new Date().toISOString()
+  };
+  localStorage.setItem('tarot-last-reading', JSON.stringify(lastReadingResult));
+}
+
+function getLastReadingResult() {
+  if (lastReadingResult) return lastReadingResult;
+  const saved = localStorage.getItem('tarot-last-reading');
+  if (saved) {
+    lastReadingResult = JSON.parse(saved);
+    return lastReadingResult;
+  }
+  return null;
+}
 
 // ============================================
 // 페이지 네비게이션
@@ -26,7 +51,79 @@ function navigateTo(page) {
   if (page === 'reading') backToSpreadSelection();
   if (page === 'study') initStudyPage();
   if (page === 'journal') renderJournalList();
+  if (page === 'request') initRequestPage();
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ============================================
+// ★ 의뢰 페이지 초기화 (C안: 카드 유무 분기)
+// ============================================
+function initRequestPage() {
+  const reading = getLastReadingResult();
+  const noCardsDiv = document.getElementById('request-no-cards');
+  const withCardsDiv = document.getElementById('request-with-cards');
+
+  if (!reading || !reading.cards || reading.cards.length === 0) {
+    // 카드 없음 → 서비스 안내
+    noCardsDiv.classList.remove('hidden');
+    withCardsDiv.classList.add('hidden');
+  } else {
+    // 카드 있음 → 의뢰 폼
+    noCardsDiv.classList.add('hidden');
+    withCardsDiv.classList.remove('hidden');
+    renderRequestCardPreview(reading);
+    updateRequestPrice(reading);
+    // 질문 자동 채우기
+    const questionField = document.getElementById('request-question');
+    if (questionField && reading.question && !questionField.value) {
+      questionField.value = reading.question;
+    }
+  }
+}
+
+function renderRequestCardPreview(reading) {
+  const container = document.getElementById('request-card-preview');
+  if (!container) return;
+
+  const labels = getPositionLabels(reading.spreadType);
+  const spreadName = getSpreadName(reading.spreadType);
+
+  let html = `<div class="request-preview-header">
+    <span class="request-spread-badge">${spreadName}</span>
+    <span class="request-preview-date">${formatDate(reading.timestamp)}</span>
+  </div>`;
+  html += '<div class="request-preview-cards">';
+
+  reading.cards.forEach((card, i) => {
+    const direction = card.isReversed ? '역방향' : '정방향';
+    const dirClass = card.isReversed ? 'reversed' : 'upright';
+    html += `
+      <div class="request-preview-card">
+        <span class="request-card-position">${labels[i] || `카드 ${i + 1}`}</span>
+        <span class="request-card-name">${card.name}</span>
+        <span class="request-card-dir ${dirClass}">${direction}</span>
+      </div>`;
+  });
+
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function updateRequestPrice(reading) {
+  const priceDisplay = document.getElementById('request-price-display');
+  if (!priceDisplay) return;
+
+  const prices = {
+    'one-card': { label: '원카드', price: '5,000원' },
+    'three-past-present-future': { label: '쓰리카드', price: '8,000원' },
+    'three-situation-obstacle-advice': { label: '쓰리카드', price: '8,000원' },
+    'three-mind-action-result': { label: '쓰리카드', price: '8,000원' },
+    'spirit-tarot': { label: '영타로(쓰리카드)', price: '8,000원' },
+    'celtic-cross': { label: '켈틱크로스', price: '15,000원' }
+  };
+
+  const info = prices[reading.spreadType] || { label: '기본', price: '5,000원' };
+  priceDisplay.innerHTML = `💰 ${info.label} 분석: <strong>${info.price}</strong>`;
 }
 
 // ============================================
@@ -48,8 +145,8 @@ document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('.admin-tabs .tab-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       document.querySelectorAll('.admin-tab-content').forEach(c => {
-        c.classList.remove('active');
-        c.classList.add('hidden');
+        c.classList.remove('hidden');
+        c.classList.add('active');
       });
       const target = document.getElementById(`admin-tab-${btn.dataset.adminTab}`);
       if (target) {
@@ -136,13 +233,26 @@ function displayDailyCard(cardId, reversed) {
 }
 
 // ============================================
-// 이메일 의뢰 (수정: localStorage 저장 강화)
+// 이메일 의뢰 (★ 카드 정보 포함)
 // ============================================
 function submitRequest(event) {
   event.preventDefault();
   const email = document.getElementById('request-email').value;
   const question = document.getElementById('request-question').value;
-  const spread = document.getElementById('request-spread').value;
+  const depositor = document.getElementById('request-depositor')?.value || '';
+  const reading = getLastReadingResult();
+
+  if (!reading || !reading.cards || reading.cards.length === 0) {
+    showToast('카드를 먼저 뽑아주세요.', 'error');
+    return;
+  }
+
+  const spreadName = getSpreadName(reading.spreadType);
+  const labels = getPositionLabels(reading.spreadType);
+  const cardInfo = reading.cards.map((card, i) => {
+    const dir = card.isReversed ? '역방향' : '정방향';
+    return `${labels[i] || `카드 ${i + 1}`}: ${card.name} (${dir})`;
+  }).join('\n');
 
   // 로컬 저장
   const requests = JSON.parse(localStorage.getItem('tarot-requests') || '[]');
@@ -150,7 +260,10 @@ function submitRequest(event) {
     id: Date.now(),
     email,
     question,
-    spread: spread || '전문가 추천',
+    depositor,
+    spread: spreadName,
+    spreadType: reading.spreadType,
+    cards: reading.cards,
     date: new Date().toISOString(),
     status: 'pending'
   };
@@ -158,12 +271,14 @@ function submitRequest(event) {
   localStorage.setItem('tarot-requests', JSON.stringify(requests));
 
   // mailto 링크
-  const subject = encodeURIComponent('[타로 리딩 의뢰] 전문가 분석 요청');
+  const subject = encodeURIComponent(`[타로 리딩 의뢰] ${spreadName} 분석 요청`);
   const body = encodeURIComponent(
     `안녕하세요, 타로 리딩을 의뢰드립니다.\n\n` +
     `이메일: ${email}\n` +
-    `질문: ${question}\n` +
-    `선호 스프레드: ${spread || '전문가 추천'}\n` +
+    `입금자명: ${depositor}\n` +
+    `스프레드: ${spreadName}\n\n` +
+    `=== 선택된 카드 ===\n${cardInfo}\n\n` +
+    `=== 질문 ===\n${question}\n\n` +
     `날짜: ${new Date().toLocaleString('ko-KR')}`
   );
   window.open(`mailto:?subject=${subject}&body=${body}`);
@@ -192,7 +307,6 @@ function formatDate(dateStr) {
   });
 }
 
-// ★ 켈틱크로스 추가
 function getSpreadName(type) {
   const names = {
     'one-card': '원카드',
@@ -205,7 +319,6 @@ function getSpreadName(type) {
   return names[type] || type;
 }
 
-// ★ 켈틱크로스 10포지션 라벨 추가
 function getPositionLabels(spreadType) {
   const labels = {
     'one-card': ['현재 상황/답변'],

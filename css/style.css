@@ -1,4 +1,23 @@
 /* ============================================
+   기본 테마 변수 (default.css에서 통합)
+   ============================================ */
+:root {
+  --bg-color: #FFFFFF;
+  --card-bg: #F8F9FA;
+  --header-bg: rgba(255,255,255,0.95);
+  --text-color: #2D2D2D;
+  --text-light: #6c757d;
+  --primary-color: #6C5CE7;
+  --primary-hover: #5A4BD1;
+  --sub-color: #A29BFE;
+  --border-color: #E9ECEF;
+  --hover-bg: #F1F3F5;
+  --shadow-color: rgba(108, 92, 231, 0.1);
+  --font-family: '맑은 고딕', 'Malgun Gothic', sans-serif;
+  --font-size: 14px;
+}
+
+/* ============================================
    타로 앱 - 메인 스타일시트
    v1.0.2 - iOS + Android 최적화
    ============================================ */
@@ -124,15 +143,6 @@ a, button, .btn {
   display: flex;
   gap: 0.5rem;
   align-items: center;
-}
-
-#theme-toggle {
-  background: none;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 0.4rem 0.6rem;
-  cursor: pointer;
-  font-size: 1rem;
 }
 
 /* ---- Main ---- */
@@ -2313,4 +2323,166 @@ a, button, .btn {
   .request-price-info p {
     font-size: 0.75rem;
   }
+}
+
+/* ============================================
+   의뢰 페이지 — 카드 없을 때 안내
+   ============================================ */
+.request-no-cards {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.request-how-to {
+  text-align: left;
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px;
+  padding: 1.2rem;
+  margin: 1.5rem 0;
+}
+
+.request-how-to ol {
+  padding-left: 1.2rem;
+  margin: 0.8rem 0 0;
+}
+
+.request-how-to li {
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+.request-notice {
+  color: #aaa;
+  font-size: 0.85rem;
+  margin-top: 0.8rem;
+}
+
+.price-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 1rem;
+  background: rgba(255,255,255,0.05);
+  border-radius: 8px;
+}
+
+.price-label {
+  font-size: 0.95rem;
+}
+
+.price-value {
+  font-weight: bold;
+  color: #f0c040;
+}
+
+/* ============================================
+   의뢰 페이지 — 카드 미리보기
+   ============================================ */
+.request-card-preview {
+  margin: 1rem 0 1.5rem;
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.request-preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+}
+
+.request-spread-badge {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+.request-preview-date {
+  color: #aaa;
+  font-size: 0.8rem;
+}
+
+.request-preview-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.request-preview-card {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.request-preview-card:last-child {
+  border-bottom: none;
+}
+
+.request-card-position {
+  color: #aaa;
+  font-size: 0.8rem;
+  min-width: 90px;
+}
+
+.request-card-name {
+  flex: 1;
+  font-weight: 500;
+}
+
+.request-card-dir {
+  font-size: 0.8rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 10px;
+}
+
+.request-card-dir.upright {
+  background: rgba(100,200,100,0.2);
+  color: #8f8;
+}
+
+.request-card-dir.reversed {
+  background: rgba(200,100,100,0.2);
+  color: #f88;
+}
+
+/* ============================================
+   의뢰 결제 안내
+   ============================================ */
+.request-payment-info {
+  background: rgba(240,192,64,0.1);
+  border: 1px solid rgba(240,192,64,0.3);
+  border-radius: 12px;
+  padding: 1.2rem;
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.request-price-display {
+  font-size: 1.1rem;
+  margin: 0.5rem 0;
+}
+
+.bank-info {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #f0c040;
+  margin: 0.5rem 0;
+}
+
+.bank-notice {
+  font-size: 0.8rem;
+  color: #aaa;
 }

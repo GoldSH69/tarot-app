@@ -24,7 +24,6 @@
   
   <title>타로 - 학습 & 리딩</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/themes/default.css" id="theme-link">
 </head>
 <body>
   <!-- 헤더 -->
@@ -38,9 +37,6 @@
         <button class="nav-btn" data-page="journal">📝 일지</button>
         <button class="nav-btn" data-page="request">📮 의뢰</button>
       </nav>
-      <div class="header-actions">
-        <button id="theme-toggle" onclick="cycleTheme()" title="테마 변경">🎨</button>
-      </div>
     </div>
   </header>
 
@@ -74,11 +70,6 @@
           <span class="feature-icon">📝</span>
           <h3>리딩 일지</h3>
           <p>나의 리딩 기록을 저장하고 되돌아보세요</p>
-        </div>
-        <div class="feature-card" onclick="navigateTo('request')">
-          <span class="feature-icon">📮</span>
-          <h3>전문 상담 의뢰</h3>
-          <p>전문가 감수 AI 분석을 받아보세요</p>
         </div>
       </div>
       <div class="daily-card-section">
@@ -129,7 +120,7 @@
         <h2>🃏 카드 리딩</h2>
       </div>
 
-      <!-- 스프레드 선택 (켈틱크로스 포함) -->
+      <!-- 스프레드 선택 -->
       <div id="spread-selection" class="spread-grid">
         <div class="spread-card" onclick="startReading('one-card')">
           <span class="spread-icon">🎴</span>
@@ -248,7 +239,7 @@
           <p>명상 중... 마음을 비워주세요</p>
         </div>
         <div id="spirit-shuffle" class="hidden">
-          <p class="spirit-instruction">카드가 섞이고 있습니다...<br><strong>"느낌이 올 때"</strong> 아래 버튼을 누르세요</p>
+                    <p class="spirit-instruction">카드가 섞이고 있습니다...<br><strong>"느낌이 올 때"</strong> 아래 버튼을 누르세요</p>
           <div class="shuffle-animation" id="shuffle-animation">
             <div class="shuffle-cards">
               <div class="shuffle-card s1"></div>
@@ -305,56 +296,110 @@
       </div>
     </section>
 
-    <!-- 의뢰 -->
+    <!-- ★ 의뢰 (C안: 카드 유무에 따라 분기) -->
     <section id="page-request" class="page">
       <div class="page-header">
         <h2>📮 전문 상담 의뢰</h2>
       </div>
       <div class="request-content">
-        <div class="request-info">
-          <h3>🌟 전문가 감수 AI 분석 서비스</h3>
-          <p>타로 전통 해석 기반 AI 분석 결과를<br>전문가가 검토·감수하여 이메일로 발송합니다.</p>
-          <ul class="request-features">
-            <li>✅ 심층 카드 해석 (무료 분석보다 상세)</li>
-            <li>✅ 카드 간 관계 및 흐름 분석</li>
-            <li>✅ 구체적 행동 가이드 포함</li>
-            <li>✅ 전문가 감수 후 이메일 발송</li>
-            <li>✅ 이메일 1회 후속 질문 가능</li>
-          </ul>
-          <div class="request-price-info">
-            <p>💰 원카드: 5,000원 | 쓰리카드: 8,000원 | 켈틱크로스: 15,000원</p>
+        <!-- ★ 카드 없을 때: 서비스 안내 + 리딩 유도 -->
+        <div id="request-no-cards" class="request-no-cards">
+          <div class="request-info">
+            <h3>💎 전문가 감수 AI 분석 서비스</h3>
+            <p>타로 전통 해석 기반 AI 분석 결과를<br>전문가가 검토·감수하여 이메일로 발송합니다.</p>
+            
+            <div class="request-price-info">
+              <h4>💰 가격 안내</h4>
+              <div class="price-table">
+                <div class="price-row">
+                  <span class="price-label">🎴 원카드</span>
+                  <span class="price-value">5,000원</span>
+                </div>
+                <div class="price-row">
+                  <span class="price-label">🃏 쓰리카드</span>
+                  <span class="price-value">8,000원</span>
+                </div>
+                <div class="price-row">
+                  <span class="price-label">✝️ 켈틱크로스</span>
+                  <span class="price-value">15,000원</span>
+                </div>
+              </div>
+            </div>
+
+            <ul class="request-features">
+              <li>✅ 심층 카드 해석 (무료 분석보다 상세)</li>
+              <li>✅ 카드 간 관계 및 흐름 분석</li>
+              <li>✅ 구체적 행동 가이드 포함</li>
+              <li>✅ 전문가 감수 후 이메일 발송</li>
+              <li>✅ 이메일 1회 후속 질문 가능</li>
+            </ul>
+
+            <div class="request-how-to">
+              <h4>📌 이용 방법</h4>
+              <ol>
+                <li>카드 리딩에서 카드를 뽑습니다</li>
+                <li>리딩 결과 화면에서 무료 AI 분석을 받아봅니다</li>
+                <li>더 깊은 분석을 원하시면 여기서 의뢰합니다</li>
+                <li>입금 확인 후 24~48시간 내 이메일로 결과 발송</li>
+              </ol>
+            </div>
+
+            <button class="btn btn-primary btn-lg" onclick="navigateTo('reading')" style="margin-top:1.5rem;">
+              🃏 카드 리딩하러 가기
+            </button>
+            <p class="request-notice">※ 카드를 먼저 뽑은 후 의뢰할 수 있습니다</p>
           </div>
         </div>
-        <form id="request-form" class="request-form" onsubmit="submitRequest(event)">
-          <div class="form-group">
-            <label>이메일 주소 *</label>
-            <input type="email" id="request-email" required placeholder="회신 받으실 이메일">
+
+        <!-- ★ 카드 있을 때: 의뢰 폼 -->
+        <div id="request-with-cards" class="hidden">
+          <div class="request-info">
+            <h3>🌟 전문가 감수 AI 분석 서비스</h3>
+            <p>아래 카드로 전문가 감수 AI 분석을 의뢰합니다.</p>
           </div>
-          <div class="form-group">
-            <label>질문 내용 *</label>
-            <textarea id="request-question" rows="4" required placeholder="궁금한 내용을 자세히 적어주세요"></textarea>
-          </div>
-          <div class="form-group">
-            <label>선호하는 스프레드 (선택)</label>
-            <select id="request-spread">
-              <option value="">전문가에게 맡기기</option>
-              <option value="one-card">원카드 (5,000원)</option>
-              <option value="three-card">쓰리카드 (8,000원)</option>
-              <option value="celtic-cross">켈틱크로스 (15,000원)</option>
-            </select>
-          </div>
-          <button type="submit" class="btn btn-primary btn-lg">📮 의뢰 전송</button>
-          <div class="request-disclaimer">
-            <p><strong>📋 서비스 안내</strong></p>
-            <ul>
-              <li>본 서비스는 AI 기반 타로 카드 분석 서비스입니다.</li>
-              <li>전문 상담사의 직접 상담이 아닌, AI가 생성한 해석 결과를 전문가가 감수하여 제공합니다.</li>
-              <li>분석 결과는 자기성찰을 위한 참고용이며, 의료·법률·재정 등 전문 분야의 조언을 대체하지 않습니다.</li>
-              <li>결제 후 제공되는 콘텐츠 특성상 환불이 제한될 수 있습니다.</li>
-              <li>동일한 질문·카드 조합의 재열람은 추가 비용 없이 제공됩니다.</li>
-            </ul>
-          </div>
-        </form>
+
+          <!-- 선택된 카드 미리보기 -->
+          <div id="request-card-preview" class="request-card-preview"></div>
+
+          <form id="request-form" class="request-form" onsubmit="submitRequest(event)">
+            <div class="form-group">
+              <label>이메일 주소 *</label>
+              <input type="email" id="request-email" required placeholder="회신 받으실 이메일">
+            </div>
+            <div class="form-group">
+              <label>질문 내용 *</label>
+              <textarea id="request-question" rows="4" required placeholder="궁금한 내용을 자세히 적어주세요"></textarea>
+            </div>
+            <div class="form-group">
+              <label>입금자명 *</label>
+              <input type="text" id="request-depositor" required placeholder="입금하실 이름">
+            </div>
+
+            <div class="request-payment-info">
+              <h4>💳 결제 안내</h4>
+              <p id="request-price-display" class="request-price-display"></p>
+              <p class="bank-info">카카오뱅크 3333-xx-xxxxxxx (홍길동)</p>
+              <p class="bank-notice">※ 위 계좌로 입금 후 의뢰를 전송해 주세요</p>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg">📮 의뢰 전송</button>
+            
+            <div class="request-disclaimer">
+              <p><strong>📋 서비스 안내</strong></p>
+              <ul>
+                <li>본 서비스는 AI 기반 타로 카드 분석 서비스입니다.</li>
+                <li>전문 상담사의 직접 상담이 아닌, AI가 생성한 해석 결과를 전문가가 감수하여 제공합니다.</li>
+                <li>분석 결과는 자기성찰을 위한 참고용이며, 의료·법률·재정 등 전문 분야의 조언을 대체하지 않습니다.</li>
+                <li>결제 후 제공되는 콘텐츠 특성상 환불이 제한될 수 있습니다.</li>
+                <li>동일한 질문·카드 조합의 재열람은 추가 비용 없이 제공됩니다.</li>
+              </ul>
+            </div>
+          </form>
+
+          <button class="btn btn-secondary" onclick="navigateTo('reading')" style="margin-top:1rem;">
+            ← 다른 카드로 다시 뽑기
+          </button>
+        </div>
       </div>
     </section>
 
@@ -417,7 +462,6 @@
   <div id="toast-container"></div>
 
   <script src="js/cards.js"></script>
-  <script src="js/theme.js"></script>
   <script src="js/app.js"></script>
   <script src="js/study.js"></script>
   <script src="js/reading.js"></script>
