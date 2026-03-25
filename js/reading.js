@@ -10,7 +10,7 @@ var requiredCardCount = 1;
 var deckCards = [];
 
 // ============================================
-// 스프레드 선택
+// ★★ 스프레드 선택 (카드 초기화 수정)
 // ============================================
 function backToSpreadSelection() {
   document.getElementById('spread-selection').classList.remove('hidden');
@@ -18,11 +18,24 @@ function backToSpreadSelection() {
   document.getElementById('question-input-section').classList.add('hidden');
   document.getElementById('card-draw-area').classList.add('hidden');
   document.getElementById('spirit-tarot-area').classList.add('hidden');
-  document.getElementById('reading-result').classList.remove('hidden');
   document.getElementById('reading-result').classList.add('hidden');
+
+  // ★★★ 카드 초기화 ★★★
   selectedReadingCards = [];
   currentSpreadType = '';
   currentQuestion = '';
+
+  var selectedArea = document.getElementById('selected-cards-area');
+  if (selectedArea) selectedArea.innerHTML = '';
+
+  var resultCards = document.getElementById('result-cards');
+  if (resultCards) resultCards.innerHTML = '';
+
+  var resultGuide = document.getElementById('result-guide');
+  if (resultGuide) resultGuide.innerHTML = '';
+
+  var aiSection = document.getElementById('ai-analysis-section');
+  if (aiSection) aiSection.innerHTML = '';
 }
 
 function showThreeCardOptions() {
@@ -33,7 +46,6 @@ function showThreeCardOptions() {
 function startReading(spreadType) {
   currentSpreadType = spreadType;
 
-  // ★ 켈틱크로스 추가
   if (spreadType === 'one-card') {
     requiredCardCount = 1;
   } else if (spreadType.startsWith('three-')) {
@@ -55,7 +67,6 @@ function startReading(spreadType) {
   document.getElementById('question-input-section').classList.remove('hidden');
   document.getElementById('selected-spread-name').textContent = '🃏 ' + getSpreadName(spreadType);
 
-  // ★ 켈틱크로스 안내 문구 추가
   var guideArea = document.getElementById('celtic-guide-in-question');
   if (guideArea) {
     if (spreadType === 'celtic-cross') {
@@ -67,13 +78,19 @@ function startReading(spreadType) {
 }
 
 // ============================================
-// 카드 뽑기
+// ★★ 카드 뽑기 (초기화 수정)
 // ============================================
 function beginCardDraw() {
   currentQuestion = document.getElementById('reading-question').value;
   document.getElementById('question-input-section').classList.add('hidden');
   document.getElementById('card-draw-area').classList.remove('hidden');
+
+  // ★★★ 이전 카드 완전 초기화 ★★★
   selectedReadingCards = [];
+
+  var selectedArea = document.getElementById('selected-cards-area');
+  if (selectedArea) selectedArea.innerHTML = '';
+
   generateDeck();
   updateDrawInstruction();
 }
@@ -156,7 +173,6 @@ function updateDrawInstruction() {
   var remaining = requiredCardCount - selectedReadingCards.length;
 
   if (remaining > 0) {
-    // ★ 켈틱크로스: 현재 선택 중인 포지션 표시
     if (currentSpreadType === 'celtic-cross') {
       var labels = getPositionLabels('celtic-cross');
       var currentPos = labels[selectedReadingCards.length] || '';
@@ -173,7 +189,7 @@ function updateDrawInstruction() {
 }
 
 // ============================================
-// ★ 리딩 결과 표시 (켈틱크로스 포함)
+// ★★ 리딩 결과 표시
 // ============================================
 function showReadingResult() {
   document.getElementById('card-draw-area').classList.add('hidden');
@@ -190,10 +206,8 @@ function showReadingResult() {
   var cardsHtml = '';
 
   if (currentSpreadType === 'celtic-cross') {
-    // ★★ 켈틱크로스 전용 레이아웃 ★★
     cardsHtml = buildCelticCrossLayout(labels);
   } else {
-    // 기존 레이아웃 (원카드/쓰리카드/영타로)
     for (var i = 0; i < selectedReadingCards.length; i++) {
       var card = selectedReadingCards[i];
       var imgClass = card.isReversed ? 'reversed' : '';
@@ -220,7 +234,6 @@ function showReadingResult() {
     guideHtml += '<hr style="border:none;border-top:1px solid var(--border-color);margin:0.75rem 0;">';
   }
 
-  // ★ 각 카드별 상세 해석
   for (var j = 0; j < selectedReadingCards.length; j++) {
     var c = selectedReadingCards[j];
     var posLabel = c.isJumpCard ? '🌟 점프카드' : (labels[j] || '카드 ' + (j + 1));
@@ -250,7 +263,6 @@ function showReadingResult() {
       };
     }
 
-    // ★ 켈틱크로스: 포지션별 해석 힌트 추가
     var positionHint = '';
     if (currentSpreadType === 'celtic-cross') {
       positionHint = getCelticPositionHint(j);
@@ -261,12 +273,10 @@ function showReadingResult() {
     guideHtml += '    [' + posLabel + '] ' + c.name + ' — ' + directionText;
     guideHtml += '  </h4>';
 
-    // 포지션 힌트
     if (positionHint) {
       guideHtml += '  <p style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 0.5rem; font-style: italic;">💡 ' + positionHint + '</p>';
     }
 
-    // 키워드 배지
     guideHtml += '  <div class="keywords" style="margin: 0.3rem 0 0.5rem;">';
     for (var k = 0; k < meaning.keywords.length; k++) {
       var kwClass = c.isReversed ? 'reversed' : 'upright';
@@ -274,16 +284,13 @@ function showReadingResult() {
     }
     guideHtml += '  </div>';
 
-    // 의미 설명
     guideHtml += '  <p style="font-size: 0.9rem; line-height: 1.7;">' + meaning.meaning + '</p>';
 
-    // 상징
     if (c.symbols) {
       guideHtml += '  <p style="font-size: 0.8rem; color: var(--text-light); margin-top: 0.5rem;">🔮 상징: ' + c.symbols + '</p>';
     }
 
     guideHtml += '</div>';
-
   }
 
   // ===== 종합 조언 =====
@@ -305,12 +312,12 @@ function showReadingResult() {
 
   resultGuide.innerHTML = guideHtml;
 
-  // ★★★ [추가] AI 섹션을 관리자/일반에 맞게 렌더 ★★★
+  // ★★★ AI 섹션 렌더 (관리자/일반 분기) ★★★
   renderAIAnalysisSection();
 }
 
 // ============================================
-// ★★ 켈틱크로스 전용 레이아웃 빌더 ★★
+// ★★★ 켈틱크로스 레이아웃 (겹침 해결 버전) ★★★
 // ============================================
 function buildCelticCrossLayout(labels) {
   var html = '<div class="celtic-cross-layout">';
@@ -318,28 +325,34 @@ function buildCelticCrossLayout(labels) {
   // --- 십자 영역 ---
   html += '<div class="celtic-cross-section">';
 
-  // 카드 3: 의식/목표 (위)
+  // ③ 의식/목표 (위)
   html += buildCelticCard(2, labels[2], 'celtic-pos-top');
 
-  // 중간 줄: 5-과거, 1/2-중앙, 6-미래
+  // 중간 줄: ⑤ - 중앙(①②) - ⑥
   html += '<div class="celtic-cross-middle">';
   html += buildCelticCard(4, labels[4], 'celtic-pos-left');
 
-  // 중앙 (1번 위에 2번 겹침)
+  // ★ 중앙: 이미지만 겹침 (텍스트 분리)
   html += '<div class="celtic-center-stack">';
-  html += buildCelticCard(0, labels[0], 'celtic-pos-center');
-  html += buildCelticCard(1, labels[1], 'celtic-pos-crossing');
+  html += buildCelticCenterImage(0, false);
+  html += buildCelticCenterImage(1, true);
   html += '</div>';
 
   html += buildCelticCard(5, labels[5], 'celtic-pos-right');
   html += '</div>';
 
-  // 카드 4: 무의식/기반 (아래)
+  // ★ 중앙 카드 정보 (겹침 없이 표시)
+  html += '<div class="celtic-center-info">';
+  html += buildCelticCenterInfo(0, labels[0]);
+  html += buildCelticCenterInfo(1, labels[1]);
+  html += '</div>';
+
+  // ④ 무의식/기반 (아래)
   html += buildCelticCard(3, labels[3], 'celtic-pos-bottom');
 
   html += '</div>'; // celtic-cross-section 끝
 
-  // --- 기둥 영역 (7~10, 아래→위) ---
+  // --- 기둥 영역 (⑦~⑩, 아래→위) ---
   html += '<div class="celtic-pillar-section">';
   html += buildCelticCard(9, labels[9], 'celtic-pos-pillar celtic-pillar-4');
   html += buildCelticCard(8, labels[8], 'celtic-pos-pillar celtic-pillar-3');
@@ -351,25 +364,56 @@ function buildCelticCrossLayout(labels) {
   return html;
 }
 
+// ★ 중앙 이미지만 (텍스트 없이)
+function buildCelticCenterImage(index, isCrossing) {
+  var card = selectedReadingCards[index];
+  if (!card) return '';
+
+  var imgClass = card.isReversed ? 'reversed' : '';
+  var extraImgClass = isCrossing ? ' celtic-crossing-img' : '';
+
+  if (isCrossing && card.isReversed) {
+    imgClass = '';
+    extraImgClass = ' celtic-crossing-img celtic-crossing-reversed';
+  }
+
+  var posClass = isCrossing ? 'celtic-center-crossing' : 'celtic-center-base';
+
+  var html = '<div class="' + posClass + '">';
+  html += '  <img src="' + getCardImageUrl(card) + '" alt="' + card.name + '" class="celtic-card-img ' + imgClass + extraImgClass + '"';
+  html += '       onerror="this.src=\'' + createCardPlaceholder(card) + '\'">';
+  html += '</div>';
+  return html;
+}
+
+// ★ 중앙 카드 정보 (겹침 없이 분리 표시)
+function buildCelticCenterInfo(index, label) {
+  var card = selectedReadingCards[index];
+  if (!card) return '';
+
+  var direction = card.isReversed ? '역방향' : '정방향';
+  var icon = index === 0 ? '🎯' : '⚔️';
+
+  var html = '<div class="celtic-center-info-item">';
+  html += '  <span class="celtic-center-icon">' + icon + '</span>';
+  html += '  <span class="celtic-center-label">' + label + '</span>';
+  html += '  <span class="celtic-center-name">' + card.name + '</span>';
+  html += '  <span class="celtic-center-dir ' + (card.isReversed ? 'reversed' : 'upright') + '">' + direction + '</span>';
+  html += '</div>';
+  return html;
+}
+
+// ★ 일반 카드 (십자 외곽 + 기둥)
 function buildCelticCard(index, label, posClass) {
   var card = selectedReadingCards[index];
   if (!card) return '';
 
   var imgClass = card.isReversed ? 'reversed' : '';
   var direction = card.isReversed ? '역방향' : '정방향';
-  var isCrossing = (posClass === 'celtic-pos-crossing');
-
-  // 2번 카드(도전)는 가로로 표시
-  var extraImgClass = isCrossing ? ' celtic-crossing-img' : '';
-  if (isCrossing && card.isReversed) {
-    // 역방향 + 가로 겹침: 역방향 해제하고 가로만 적용 (시각적 혼란 방지)
-    imgClass = '';
-    extraImgClass = ' celtic-crossing-img celtic-crossing-reversed';
-  }
 
   var html = '<div class="celtic-card-item ' + posClass + '">';
   html += '  <div class="celtic-card-label">' + label + '</div>';
-  html += '  <img src="' + getCardImageUrl(card) + '" alt="' + card.name + '" class="celtic-card-img ' + imgClass + extraImgClass + '"';
+  html += '  <img src="' + getCardImageUrl(card) + '" alt="' + card.name + '" class="celtic-card-img ' + imgClass + '"';
   html += '       onerror="this.src=\'' + createCardPlaceholder(card) + '\'">';
   html += '  <div class="celtic-card-name">' + card.name + '</div>';
   html += '  <div class="celtic-card-direction">' + direction + '</div>';
@@ -378,7 +422,7 @@ function buildCelticCard(index, label, posClass) {
 }
 
 // ============================================
-// ★ 켈틱크로스 포지션별 해석 힌트
+// 켈틱크로스 포지션별 해석 힌트
 // ============================================
 function getCelticPositionHint(index) {
   var hints = [
@@ -454,7 +498,6 @@ function buildCelticCrossAdvice(labels) {
   var html = '  <p style="font-size:0.9rem; line-height:1.7;">';
   html += '    10장의 카드가 당신의 상황을 다각도로 보여주고 있습니다.<br><br>';
 
-  // 중심부 요약 (1, 2번)
   var c1 = selectedReadingCards[0];
   var c2 = selectedReadingCards[1];
   var c10 = selectedReadingCards[9];
@@ -466,7 +509,6 @@ function buildCelticCrossAdvice(labels) {
   html += '    <strong>🔹 중심 에너지:</strong> ' + c1.name + '(' + m1 + ')이 현재 상황의 핵심이며, ';
   html += c2.name + '(' + m2 + ')이 도전으로 작용하고 있습니다.<br><br>';
 
-  // 시간축 요약 (5→6)
   var c5 = selectedReadingCards[4];
   var c6 = selectedReadingCards[5];
   var m5 = getFirstKeyword(c5);
@@ -474,7 +516,6 @@ function buildCelticCrossAdvice(labels) {
   html += '    <strong>🔹 시간의 흐름:</strong> 과거의 ' + c5.name + '(' + m5 + ') 에너지에서 ';
   html += '가까운 미래의 ' + c6.name + '(' + m6 + ') 에너지로 이동하고 있습니다.<br><br>';
 
-  // 최종 결과
   html += '    <strong>🔹 최종 결과:</strong> ' + c10.name + '(' + m10 + ')이 현재 흐름의 귀결을 보여줍니다.';
 
   if (c10.isReversed) {
@@ -490,7 +531,6 @@ function buildCelticCrossAdvice(labels) {
   return html;
 }
 
-// 첫 번째 키워드 가져오기 헬퍼
 function getFirstKeyword(card) {
   var meaning = card.isReversed ? card.reversedData : card.uprightData;
   if (!meaning || !meaning.keywords) {

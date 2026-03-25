@@ -1749,192 +1749,173 @@ a, button, .btn {
   }
 }
 
-/* ---- 다크모드 미디어쿼리 (시스템 다크모드 감지용, 향후 활용) ---- */
-/*
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-  }
-}
-*/
-
 /* ============================================
-   테마 변경 버튼 숨김 (v1.5 테마 완성 전까지)
-   ============================================ */
-#theme-toggle {
-  display: none !important;
-}
-
-/* ============================================
-   켈틱크로스 레이아웃 (v1.5)
+   ★★ 켈틱크로스 레이아웃 (겹침 해결 버전) ★★
    ============================================ */
 
-/* ---- 전체 레이아웃 컨테이너 ---- */
 .celtic-cross-layout {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2rem;
-  margin-bottom: 1.5rem;
+  gap: 1.5rem;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
   padding: 1rem 0;
 }
 
-/* 태블릿/PC: 십자 + 기둥 가로 배치 */
-@media (min-width: 769px) {
-  .celtic-cross-layout {
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    gap: 3rem;
-  }
-}
-
-/* ---- 십자 영역 ---- */
+/* --- 십자 영역 --- */
 .celtic-cross-section {
-  display: grid;
-  grid-template-columns: auto auto auto;
-  grid-template-rows: auto auto auto;
-  gap: 0.5rem;
-  justify-items: center;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  position: relative;
+  gap: 0.5rem;
+  flex-shrink: 0;
 }
 
-/* 십자 배치: 3열 3행 그리드 */
-/* 행1: _  ③  _ */
-/* 행2: ⑤ ①② ⑥ */
-/* 행3: _  ④  _ */
-
-.celtic-pos-top {
-  grid-column: 2;
-  grid-row: 1;
-}
-
-.celtic-pos-left {
-  grid-column: 1;
-  grid-row: 2;
-}
-
-.celtic-pos-center {
-  grid-column: 2;
-  grid-row: 2;
-  z-index: 2;
-}
-
-.celtic-pos-crossing {
-  grid-column: 2;
-  grid-row: 2;
-  z-index: 3;
-  position: relative;
-}
-
-.celtic-pos-right {
-  grid-column: 3;
-  grid-row: 2;
-}
-
-.celtic-pos-bottom {
-  grid-column: 2;
-  grid-row: 3;
-}
-
-/* ---- 중앙 겹침 스택 (1번 + 2번) ---- */
-.celtic-center-stack {
-  grid-column: 2;
-  grid-row: 2;
-  position: relative;
+/* 중간 줄 (⑤ - 중앙 - ⑥) */
+.celtic-cross-middle {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 90px;
-  height: 130px;
+  gap: 0.5rem;
 }
 
-.celtic-center-stack .celtic-pos-center {
+/* --- 중앙 겹침 (이미지만) --- */
+.celtic-center-stack {
   position: relative;
-  z-index: 2;
-  grid-column: auto;
-  grid-row: auto;
+  width: 80px;
+  height: 120px;
+  flex-shrink: 0;
 }
 
-.celtic-center-stack .celtic-pos-crossing {
+.celtic-center-base {
   position: absolute;
-  z-index: 3;
-  grid-column: auto;
-  grid-row: auto;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
 }
 
-/* ---- 기둥 영역 (7~10, 아래→위) ---- */
-.celtic-pillar-section {
+.celtic-center-crossing {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(90deg);
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+
+.celtic-center-base .celtic-card-img,
+.celtic-center-crossing .celtic-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* --- 중앙 카드 정보 (겹침 아래 분리 표시) --- */
+.celtic-center-info {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-top: 0.5rem;
+  width: 100%;
+}
+
+.celtic-center-info-item {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
   align-items: center;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  min-width: 100px;
+  gap: 0.15rem;
 }
 
-/* 모바일: 기둥을 가로 배치 */
-@media (max-width: 768px) {
-  .celtic-pillar-section {
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.75rem;
-  }
+.celtic-center-icon {
+  font-size: 1.1rem;
 }
 
-/* ---- 개별 카드 아이템 ---- */
-.celtic-card-item {
-  text-align: center;
-  width: 80px;
-  -webkit-transform: translateZ(0);
-  transform: translateZ(0);
-}
-
-.celtic-card-label {
+.celtic-center-label {
   font-size: 0.65rem;
   color: var(--primary-color);
   font-weight: 600;
-  margin-bottom: 0.15rem;
+}
+
+.celtic-center-name {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-color);
+  text-align: center;
+}
+
+.celtic-center-dir {
+  font-size: 0.65rem;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.celtic-center-dir.upright {
+  color: #2e7d32;
+  background: #e8f5e9;
+}
+
+.celtic-center-dir.reversed {
+  color: #c62828;
+  background: #ffebee;
+}
+
+/* --- 일반 카드 아이템 --- */
+.celtic-card-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.celtic-card-label {
+  font-size: 0.6rem;
+  color: var(--primary-color);
+  font-weight: 600;
+  text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 80px;
 }
 
 .celtic-card-img {
   width: 70px;
+  height: 105px;
+  object-fit: cover;
   border-radius: 6px;
-  box-shadow: 0 2px 8px var(--shadow-color);
-  transition: transform 0.2s;
-}
-
-.celtic-card-img:hover {
-  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .celtic-card-img.reversed {
   transform: rotate(180deg);
 }
 
-.celtic-card-img.reversed:hover {
-  transform: rotate(180deg) scale(1.05);
-}
-
-/* 2번 카드: 가로로 겹침 (90도 회전) */
-.celtic-crossing-img {
+.celtic-card-img.celtic-crossing-img {
   transform: rotate(90deg);
-  position: relative;
 }
 
-/* 2번 카드가 역방향인 경우: 90도 + 180도 = 270도 */
-.celtic-crossing-reversed {
+.celtic-card-img.celtic-crossing-reversed {
   transform: rotate(270deg);
 }
 
 .celtic-card-name {
-  font-size: 0.65rem;
-  font-weight: 500;
-  margin-top: 0.15rem;
-  line-height: 1.2;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--text-color);
+  max-width: 80px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1945,64 +1926,67 @@ a, button, .btn {
   color: var(--text-light);
 }
 
-/* ---- 기둥 카드 순서 (flex order로 아래→위) ---- */
-.celtic-pillar-1 { order: 4; } /* ⑦ 자신 (하단) */
-.celtic-pillar-2 { order: 3; } /* ⑧ 환경 */
-.celtic-pillar-3 { order: 2; } /* ⑨ 희망 */
-.celtic-pillar-4 { order: 1; } /* ⑩ 결과 (상단) */
-
-/* 모바일에서는 좌→우로 (order 초기화) */
-@media (max-width: 768px) {
-  .celtic-pillar-1 { order: 1; }
-  .celtic-pillar-2 { order: 2; }
-  .celtic-pillar-3 { order: 3; }
-  .celtic-pillar-4 { order: 4; }
+/* --- 기둥 영역 (⑦~⑩) --- */
+.celtic-pillar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
 }
 
-/* ---- 켈틱크로스 반응형 크기 조정 ---- */
-@media (min-width: 769px) {
-  .celtic-card-item {
-    width: 100px;
+/* --- 모바일 대응 --- */
+@media (max-width: 600px) {
+  .celtic-cross-layout {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
   }
-  .celtic-card-img {
-    width: 85px;
-  }
-  .celtic-card-label {
-    font-size: 0.7rem;
-  }
-  .celtic-card-name {
-    font-size: 0.7rem;
-  }
+
   .celtic-center-stack {
-    width: 110px;
-    height: 155px;
+    width: 65px;
+    height: 98px;
   }
-}
 
-@media (max-width: 480px) {
   .celtic-card-item {
     width: 65px;
   }
+
   .celtic-card-img {
-    width: 55px;
+    width: 58px;
+    height: 87px;
   }
+
   .celtic-card-label {
     font-size: 0.55rem;
+    max-width: 65px;
   }
+
   .celtic-card-name {
-    font-size: 0.55rem;
+    font-size: 0.6rem;
+    max-width: 65px;
   }
-  .celtic-card-direction {
-    font-size: 0.5rem;
+
+  .celtic-center-info {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
   }
-  .celtic-center-stack {
-    width: 70px;
-    height: 105px;
+
+  .celtic-center-info-item {
+    flex-direction: row;
+    min-width: auto;
+    gap: 0.4rem;
+    padding: 0.4rem 0.6rem;
   }
-  .celtic-cross-section {
-    gap: 0.25rem;
+
+  .celtic-pillar-section {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
   }
 }
+
 
 /* ============================================
    켈틱크로스 안내 박스 (질문 입력 화면)
