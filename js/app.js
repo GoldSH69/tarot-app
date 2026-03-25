@@ -6,7 +6,7 @@
 // ============================================
 // ★★★ Cloudflare Worker URL — 여기만 수정! ★★★
 // ============================================
-const WORKER_URL = 'https://tarot-api.ashywindy.workers.dev';
+const WORKER_URL = 'https://tarot-server-gcql.onrender.com';
 
 // ============================================
 // 페이지 네비게이션
