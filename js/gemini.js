@@ -8,33 +8,44 @@ let aiModalPassword = '';
 let aiModalVerified = false;
 
 // ============================================
-// ★ AI 분석 버튼 클릭 핸들러 (3단 분기)
+// ★ [추가] 관리자 판별 헬퍼
+// ============================================
+function isAdmin() {
+  return !!sessionStorage.getItem('tarot-admin-pw');
+}
+
+// ============================================
+// ★ AI 분석 버튼 클릭 핸들러 (3단 분기) — 변경 없음
 // ============================================
 function handleAIAnalysisClick() {
   var savedPw = sessionStorage.getItem('tarot-admin-pw');
 
   if (savedPw) {
-    // ★ 관리자: AI 분석 모달 (제한 없음)
     aiModalPassword = savedPw;
     aiModalVerified = true;
     openAIAnalysisModal();
   } else {
-    // ★ 일반 사용자: 무료 분석 시도
     handleFreeAIAnalysis();
   }
 }
 
 // ============================================
-// ★ 무료 AI 분석 (1회/일)
+// ★ 무료 AI 분석 (1회/일) — [수정] 안전장치 추가
 // ============================================
 function handleFreeAIAnalysis() {
+  // ★ 안전장치: 관리자가 혹시 이 경로로 들어와도 모달로 보냄
+  if (isAdmin()) {
+    aiModalPassword = sessionStorage.getItem('tarot-admin-pw');
+    aiModalVerified = true;
+    openAIAnalysisModal();
+    return;
+  }
+
   var usage = getFreeAIUsage();
 
   if (usage.count >= 1) {
-    // 이미 사용함 → 의뢰 안내
     showFreeAILimitModal();
   } else {
-    // 무료 분석 실행
     executeFreeAIAnalysis();
   }
 }
@@ -63,7 +74,7 @@ function saveFreeAIUsage() {
 }
 
 // ============================================
-// ★ 무료 분석 실행
+// ★ 무료 분석 실행 — 변경 없음
 // ============================================
 async function executeFreeAIAnalysis() {
   var prompt = buildFreePrompt();
@@ -73,7 +84,6 @@ async function executeFreeAIAnalysis() {
     return;
   }
 
-  // UI 업데이트: 버튼 → 로딩 상태
   var section = document.getElementById('ai-analysis-section');
   section.innerHTML =
     '<div class="ai-free-loading">' +
@@ -92,10 +102,8 @@ async function executeFreeAIAnalysis() {
     var data = await response.json();
 
     if (data.success) {
-      // 성공 → 사용 횟수 저장
       saveFreeAIUsage();
 
-      // 결과 인라인 표시
       section.innerHTML =
         '<div class="ai-free-result">' +
         '  <div class="ai-free-result-header">' +
@@ -117,7 +125,6 @@ async function executeFreeAIAnalysis() {
 
       showToast('AI 분석이 완료되었습니다! ✨', 'success');
     } else {
-      // 실패 → 원래 버튼 복원
       restoreAISection('분석 실패: ' + (data.error || '알 수 없는 오류'));
       showToast('AI 분석에 실패했습니다.', 'error');
     }
@@ -128,7 +135,7 @@ async function executeFreeAIAnalysis() {
 }
 
 // ============================================
-// 무료 분석용 프롬프트 생성 (간결 버전)
+// 무료 분석용 프롬프트 생성 — 변경 없음
 // ============================================
 function buildFreePrompt() {
   var cards = selectedReadingCards || [];
@@ -177,25 +184,81 @@ function buildFreePrompt() {
 }
 
 // ============================================
-// AI 섹션 복원 (에러 시)
+// ★ AI 섹션 복원 — [수정] 관리자/일반 분기
 // ============================================
 function restoreAISection(errorMsg) {
   var section = document.getElementById('ai-analysis-section');
-  var usage = getFreeAIUsage();
-  var remaining = Math.max(0, 1 - usage.count);
 
-  section.innerHTML =
-    '<button class="btn btn-primary btn-lg" onclick="handleAIAnalysisClick()">' +
-    '  🔮 AI 전문가 분석 받기' +
-    '</button>' +
-    '<p style="font-size:0.8rem; color:var(--text-light); margin-top:0.5rem;">' +
-    '  AI가 타로 전통 해석을 바탕으로 분석합니다 (오늘 ' + remaining + '회 남음)' +
-    '</p>' +
-    (errorMsg ? '<p class="error-text" style="margin-top:0.5rem;">⚠️ ' + errorMsg + '</p>' : '');
+  if (isAdmin()) {
+    // ★ 관리자: 무제한
+    section.innerHTML =
+      '<button class="btn btn-primary btn-lg" onclick="handleAIAnalysisClick()">' +
+      '  🔮 AI 전문가 분석 받기' +
+      '</button>' +
+      '<p style="font-size:0.8rem; color:var(--primary-color); margin-top:0.5rem;">' +
+      '  👑 관리자 모드 — 무제한 분석' +
+      '</p>' +
+      (errorMsg ? '<p class="error-text" style="margin-top:0.5rem;">⚠️ ' + errorMsg + '</p>' : '');
+  } else {
+    // 일반: 남은 횟수 표시
+    var usage = getFreeAIUsage();
+    var remaining = Math.max(0, 1 - usage.count);
+
+    section.innerHTML =
+      '<button class="btn btn-primary btn-lg" onclick="handleAIAnalysisClick()">' +
+      '  🔮 AI 전문가 분석 받기' +
+      '</button>' +
+      '<p style="font-size:0.8rem; color:var(--text-light); margin-top:0.5rem;">' +
+      '  AI가 타로 전통 해석을 바탕으로 분석합니다 (오늘 ' + remaining + '회 남음)' +
+      '</p>' +
+      (errorMsg ? '<p class="error-text" style="margin-top:0.5rem;">⚠️ ' + errorMsg + '</p>' : '');
+  }
 }
 
 // ============================================
-// ★ 무료 분석 횟수 초과 시 안내 모달
+// ★ [추가] AI 섹션 초기 렌더링 (리딩 결과 표시 시 호출)
+// ============================================
+function renderAIAnalysisSection() {
+  var section = document.getElementById('ai-analysis-section');
+  if (!section) return;
+
+  if (isAdmin()) {
+    // ★ 관리자: 항상 버튼 활성 (무제한)
+    section.innerHTML =
+      '<button class="btn btn-primary btn-lg" onclick="handleAIAnalysisClick()">' +
+      '  🔮 AI 전문가 분석 받기' +
+      '</button>' +
+      '<p style="font-size:0.8rem; color:var(--primary-color); margin-top:0.5rem;">' +
+      '  👑 관리자 모드 — 무제한 분석' +
+      '</p>';
+  } else {
+    var usage = getFreeAIUsage();
+    var remaining = Math.max(0, 1 - usage.count);
+
+    if (remaining > 0) {
+      // 무료 잔여 있음
+      section.innerHTML =
+        '<button class="btn btn-primary btn-lg" onclick="handleAIAnalysisClick()">' +
+        '  🔮 AI 전문가 분석 받기' +
+        '</button>' +
+        '<p style="font-size:0.8rem; color:var(--text-light); margin-top:0.5rem;">' +
+        '  AI가 타로 전통 해석을 바탕으로 분석합니다 (오늘 ' + remaining + '회 남음)' +
+        '</p>';
+    } else {
+      // 무료 소진 → 의뢰 안내 (버튼은 유지하되 클릭 시 안내)
+      section.innerHTML =
+        '<button class="btn btn-primary btn-lg" onclick="handleAIAnalysisClick()" style="opacity:0.7;">' +
+        '  🔮 AI 전문가 분석 받기' +
+        '</button>' +
+        '<p style="font-size:0.8rem; color:var(--text-light); margin-top:0.5rem;">' +
+        '  오늘의 무료 분석을 이미 사용했습니다 (내일 초기화)' +
+        '</p>';
+    }
+  }
+}
+
+// ============================================
+// ★ 무료 분석 횟수 초과 시 안내 모달 — 변경 없음
 // ============================================
 function showFreeAILimitModal() {
   var section = document.getElementById('ai-analysis-section');
@@ -216,7 +279,7 @@ function showFreeAILimitModal() {
 }
 
 // ============================================
-// 무료 결과 복사
+// 무료 결과 복사 — 변경 없음
 // ============================================
 function copyFreeAIResult() {
   var body = document.querySelector('.ai-free-result-body');
@@ -236,14 +299,14 @@ function copyFreeAIResult() {
 }
 
 // ============================================
-// 무료 분석 결과에서 의뢰 페이지로 이동
+// 무료 분석 결과에서 의뢰 페이지로 이동 — 변경 없음
 // ============================================
 function goToRequestFromFree() {
   goToRequestWithQuestion();
 }
 
 // ============================================
-// 일반 사용자 → 의뢰 페이지로 이동
+// 일반 사용자 → 의뢰 페이지로 이동 — 변경 없음
 // ============================================
 function goToRequestWithQuestion() {
   var question = currentQuestion || '';
@@ -291,7 +354,7 @@ function goToRequestWithQuestion() {
 }
 
 // ============================================
-// AI 분석 모달 열기 (관리자 전용)
+// AI 분석 모달 열기 (관리자 전용) — 변경 없음
 // ============================================
 function openAIAnalysisModal() {
   var modal = document.getElementById('ai-analysis-modal');
@@ -309,7 +372,7 @@ function closeAIAnalysisModal() {
 }
 
 // ============================================
-// STEP 1: 비밀번호 입력 (세션 없을 때만)
+// STEP 1: 비밀번호 입력 — 변경 없음
 // ============================================
 function showAIPasswordStep() {
   document.getElementById('ai-step-password').classList.remove('hidden');
@@ -358,7 +421,7 @@ async function verifyAIPassword() {
 }
 
 // ============================================
-// STEP 2: 프롬프트 미리보기 & 수정
+// STEP 2: 프롬프트 미리보기 & 수정 — 변경 없음
 // ============================================
 function showAIPromptStep() {
   document.getElementById('ai-step-password').classList.add('hidden');
@@ -396,7 +459,6 @@ function buildPromptFromCurrentReading() {
     cardKeywords += '  ' + card.name + '(' + direction + '): ' + kw + '\n';
   }
 
-  // 켈틱크로스 전용 분석 지시
   var analysisInstructions = '';
   if (spreadType === 'celtic-cross') {
     analysisInstructions =
@@ -434,7 +496,7 @@ function buildPromptFromCurrentReading() {
 }
 
 // ============================================
-// 프롬프트 복사
+// 프롬프트 복사 — 변경 없음
 // ============================================
 function copyAIPrompt() {
   var textarea = document.getElementById('ai-prompt-preview');
@@ -448,7 +510,7 @@ function copyAIPrompt() {
 }
 
 // ============================================
-// STEP 3: AI 분석 실행 (관리자)
+// STEP 3: AI 분석 실행 (관리자) — 변경 없음
 // ============================================
 async function executeAIAnalysis() {
   var prompt = document.getElementById('ai-prompt-preview').value;
@@ -488,7 +550,7 @@ async function executeAIAnalysis() {
 }
 
 // ============================================
-// 결과 복사 (관리자 모달)
+// 결과 복사 (관리자 모달) — 변경 없음
 // ============================================
 function copyAIModalResult() {
   var content = document.getElementById('ai-modal-result');
@@ -507,7 +569,7 @@ function copyAIModalResult() {
 }
 
 // ============================================
-// 마크다운 → HTML 변환
+// 마크다운 → HTML 변환 — 변경 없음
 // ============================================
 function formatMarkdown(text) {
   if (!text) return '';

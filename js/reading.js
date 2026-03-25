@@ -283,6 +283,7 @@ function showReadingResult() {
     }
 
     guideHtml += '</div>';
+
   }
 
   // ===== 종합 조언 =====
@@ -303,6 +304,9 @@ function showReadingResult() {
   guideHtml += '</div>';
 
   resultGuide.innerHTML = guideHtml;
+
+  // ★★★ [추가] AI 섹션을 관리자/일반에 맞게 렌더 ★★★
+  renderAIAnalysisSection();
 }
 
 // ============================================
