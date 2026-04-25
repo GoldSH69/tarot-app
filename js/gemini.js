@@ -33,21 +33,19 @@ function handleAIAnalysisClick() {
 // ★ 무료 AI 분석 (1회/일) — [수정] 안전장치 추가
 // ============================================
 function handleFreeAIAnalysis() {
-  // ★ 안전장치: 관리자가 혹시 이 경로로 들어와도 모달로 보냄
-  if (isAdmin()) {
-    aiModalPassword = sessionStorage.getItem('tarot-admin-pw');
-    aiModalVerified = true;
-    openAIAnalysisModal();
-    return;
-  }
-
-  var usage = getFreeAIUsage();
-
-  if (usage.count >= 1) {
-    showFreeAILimitModal();
-  } else {
-    executeFreeAIAnalysis();
-  }
+  // ★ 일반 사용자 AI 분석 임시 차단 (유료 서비스 전환 예정)
+  var section = document.getElementById('ai-analysis-section');
+  section.innerHTML =
+    '<div class="ai-limit-notice">' +
+    '  <div class="ai-limit-icon">💎</div>' +
+    '  <h4>AI 전문 분석은 유료 서비스로 제공 예정입니다</h4>' +
+    '  <p>더 정확하고 깊이 있는 AI 타로 분석을<br>프리미엄 서비스로 준비하고 있습니다.</p>' +
+    '  <p style="font-size:0.85rem; color:var(--text-light); margin-top:0.5rem;">오픈 시 공지하겠습니다. 감사합니다 🙏</p>' +
+    '  <button class="btn btn-secondary btn-sm" style="margin-top:1rem;" onclick="restoreAISection(\'\')">' +
+    '    닫기' +
+    '  </button>' +
+    '</div>';
+  return;
 }
 
 // 오늘 사용 횟수 확인
