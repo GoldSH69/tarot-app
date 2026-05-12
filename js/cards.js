@@ -11,7 +11,7 @@ const TAROT_CARDS = {
       name: '바보',
       nameEn: 'The Fool',
       category: 'major',
-      image: 'images/cards/major/00-fool.jpg',
+      image: 'images/cards/major/00-fool.webp',
       upright: {
         keywords: ['새로운 시작', '모험', '자유', '순수', '무한한 가능성'],
         meaning: '새로운 여정의 시작을 의미합니다. 두려움 없이 앞으로 나아가세요. 순수한 마음으로 세상을 바라보며, 미지의 세계로 발걸음을 내딛는 용기를 나타냅니다.'
@@ -30,7 +30,7 @@ const TAROT_CARDS = {
       name: '마법사',
       nameEn: 'The Magician',
       category: 'major',
-      image: 'images/cards/major/01-magician.jpg',
+      image: 'images/cards/major/01-magician.webp',
       upright: {
         keywords: ['의지력', '창조', '집중', '능력', '행동'],
         meaning: '당신에게는 원하는 것을 이룰 수 있는 모든 도구가 있습니다. 집중력과 의지로 현실을 창조하세요.'
@@ -49,7 +49,7 @@ const TAROT_CARDS = {
       name: '여사제',
       nameEn: 'The High Priestess',
       category: 'major',
-      image: 'images/cards/major/02-high-priestess.jpg',
+      image: 'images/cards/major/02-high-priestess.webp',
       upright: {
         keywords: ['직관', '무의식', '내면의 목소리', '신비', '지혜'],
         meaning: '직관을 믿으세요. 보이지 않는 것을 느끼는 능력이 필요한 때입니다. 내면의 목소리에 귀 기울이세요.'
@@ -68,7 +68,7 @@ const TAROT_CARDS = {
       name: '여황제',
       nameEn: 'The Empress',
       category: 'major',
-      image: 'images/cards/major/03-empress.jpg',
+      image: 'images/cards/major/03-empress.webp',
       upright: {
         keywords: ['풍요', '모성', '자연', '아름다움', '창조력'],
         meaning: '풍요로움과 창조적 에너지가 넘치는 시기입니다. 자연과 연결하고, 아름다움을 즐기세요.'
@@ -87,7 +87,7 @@ const TAROT_CARDS = {
       name: '황제',
       nameEn: 'The Emperor',
       category: 'major',
-      image: 'images/cards/major/04-emperor.jpg',
+      image: 'images/cards/major/04-emperor.webp',
       upright: {
         keywords: ['권위', '구조', '안정', '리더십', '통제'],
         meaning: '체계와 질서를 세울 때입니다. 강한 리더십과 안정적인 기반을 만들어 나가세요.'
@@ -106,7 +106,7 @@ const TAROT_CARDS = {
       name: '교황',
       nameEn: 'The Hierophant',
       category: 'major',
-      image: 'images/cards/major/05-hierophant.jpg',
+      image: 'images/cards/major/05-hierophant.webp',
       upright: {
         keywords: ['전통', '가르침', '신앙', '관습', '멘토'],
         meaning: '전통적인 가치와 가르침을 따를 때입니다. 경험 많은 멘토의 조언을 구하세요.'
@@ -125,7 +125,7 @@ const TAROT_CARDS = {
       name: '연인',
       nameEn: 'The Lovers',
       category: 'major',
-      image: 'images/cards/major/06-lovers.jpg',
+      image: 'images/cards/major/06-lovers.webp',
       upright: {
         keywords: ['사랑', '조화', '선택', '가치관', '파트너십'],
         meaning: '중요한 선택의 순간입니다. 마음의 소리를 듣고 진정한 사랑과 가치에 따라 결정하세요.'
@@ -144,7 +144,7 @@ const TAROT_CARDS = {
       name: '전차',
       nameEn: 'The Chariot',
       category: 'major',
-      image: 'images/cards/major/07-chariot.jpg',
+      image: 'images/cards/major/07-chariot.webp',
       upright: {
         keywords: ['승리', '의지', '결단', '전진', '자기 통제'],
         meaning: '강한 의지로 장애물을 극복하고 승리할 때입니다. 목표를 향해 흔들림 없이 전진하세요.'
@@ -163,7 +163,7 @@ const TAROT_CARDS = {
       name: '힘',
       nameEn: 'Strength',
       category: 'major',
-      image: 'images/cards/major/08-strength.jpg',
+      image: 'images/cards/major/08-strength.webp',
       upright: {
         keywords: ['내면의 힘', '용기', '인내', '자비', '부드러운 통제'],
         meaning: '부드러움 속에 진정한 강함이 있습니다. 내면의 힘으로 어려움을 이겨내세요.'
@@ -182,7 +182,7 @@ const TAROT_CARDS = {
       name: '은둔자',
       nameEn: 'The Hermit',
       category: 'major',
-      image: 'images/cards/major/09-hermit.jpg',
+      image: 'images/cards/major/09-hermit.webp',
       upright: {
         keywords: ['성찰', '고독', '내면 탐색', '지혜', '안내'],
         meaning: '홀로 시간을 보내며 내면을 탐색할 때입니다. 진정한 답은 자신 안에 있습니다.'
@@ -201,7 +201,7 @@ const TAROT_CARDS = {
       name: '운명의 수레바퀴',
       nameEn: 'Wheel of Fortune',
       category: 'major',
-      image: 'images/cards/major/10-wheel-of-fortune.jpg',
+      image: 'images/cards/major/10-wheel-of-fortune.webp',
       upright: {
         keywords: ['운명', '변화', '순환', '행운', '전환점'],
         meaning: '인생의 전환점에 서 있습니다. 운명의 바퀴가 돌아가며 새로운 기회가 찾아옵니다.'
@@ -220,7 +220,7 @@ const TAROT_CARDS = {
       name: '정의',
       nameEn: 'Justice',
       category: 'major',
-      image: 'images/cards/major/11-justice.jpg',
+      image: 'images/cards/major/11-justice.webp',
       upright: {
         keywords: ['공정', '진실', '균형', '법', '결과'],
         meaning: '공정한 결과가 찾아옵니다. 진실에 기반하여 행동하면 정의로운 결과를 얻습니다.'
@@ -239,7 +239,7 @@ const TAROT_CARDS = {
       name: '매달린 사람',
       nameEn: 'The Hanged Man',
       category: 'major',
-      image: 'images/cards/major/12-hanged-man.jpg',
+      image: 'images/cards/major/12-hanged-man.webp',
       upright: {
         keywords: ['항복', '새로운 관점', '희생', '기다림', '깨달음'],
         meaning: '관점을 바꿔보세요. 잠시 멈추고 다른 각도에서 상황을 바라보면 새로운 깨달음을 얻습니다.'
@@ -258,7 +258,7 @@ const TAROT_CARDS = {
       name: '죽음',
       nameEn: 'Death',
       category: 'major',
-      image: 'images/cards/major/13-death.jpg',
+      image: 'images/cards/major/13-death.webp',
       upright: {
         keywords: ['끝과 시작', '변화', '변환', '해방', '재탄생'],
         meaning: '한 시대의 끝이 새로운 시작을 의미합니다. 낡은 것을 보내고 새로움을 맞이하세요.'
@@ -277,7 +277,7 @@ const TAROT_CARDS = {
       name: '절제',
       nameEn: 'Temperance',
       category: 'major',
-      image: 'images/cards/major/14-temperance.jpg',
+      image: 'images/cards/major/14-temperance.webp',
       upright: {
         keywords: ['균형', '조화', '절제', '인내', '적응'],
         meaning: '균형과 조화를 이루세요. 극단을 피하고 중용의 길을 걸으면 좋은 결과를 얻습니다.'
@@ -296,7 +296,7 @@ const TAROT_CARDS = {
       name: '악마',
       nameEn: 'The Devil',
       category: 'major',
-      image: 'images/cards/major/15-devil.jpg',
+      image: 'images/cards/major/15-devil.webp',
       upright: {
         keywords: ['속박', '유혹', '중독', '물질주의', '그림자'],
         meaning: '무엇에 얽매여 있는지 인식하세요. 자발적 속박에서 벗어날 힘은 이미 당신에게 있습니다.'
@@ -315,7 +315,7 @@ const TAROT_CARDS = {
       name: '탑',
       nameEn: 'The Tower',
       category: 'major',
-      image: 'images/cards/major/16-tower.jpg',
+      image: 'images/cards/major/16-tower.webp',
       upright: {
         keywords: ['급변', '파괴', '각성', '해방', '진실 드러남'],
         meaning: '갑작스러운 변화가 찾아옵니다. 고통스럽지만 거짓 위에 세운 것이 무너지며 진실이 드러납니다.'
@@ -334,7 +334,7 @@ const TAROT_CARDS = {
       name: '별',
       nameEn: 'The Star',
       category: 'major',
-      image: 'images/cards/major/17-star.jpg',
+      image: 'images/cards/major/17-star.webp',
       upright: {
         keywords: ['희망', '영감', '평화', '치유', '축복'],
         meaning: '희망의 빛이 비치고 있습니다. 어둠 뒤에 찾아온 평화와 치유의 시기입니다.'
@@ -353,7 +353,7 @@ const TAROT_CARDS = {
       name: '달',
       nameEn: 'The Moon',
       category: 'major',
-      image: 'images/cards/major/18-moon.jpg',
+      image: 'images/cards/major/18-moon.webp',
       upright: {
         keywords: ['환상', '불안', '무의식', '직관', '미지'],
         meaning: '모든 것이 명확하지 않은 시기입니다. 불안함 속에서도 직관을 믿고 나아가세요.'
@@ -372,7 +372,7 @@ const TAROT_CARDS = {
       name: '태양',
       nameEn: 'The Sun',
       category: 'major',
-      image: 'images/cards/major/19-sun.jpg',
+      image: 'images/cards/major/19-sun.webp',
       upright: {
         keywords: ['기쁨', '성공', '활력', '긍정', '밝은 미래'],
         meaning: '밝고 희망찬 시기입니다! 성공과 기쁨이 가득합니다. 자신감을 가지고 빛나세요.'
@@ -391,7 +391,7 @@ const TAROT_CARDS = {
       name: '심판',
       nameEn: 'Judgement',
       category: 'major',
-      image: 'images/cards/major/20-judgement.jpg',
+      image: 'images/cards/major/20-judgement.webp',
       upright: {
         keywords: ['부활', '각성', '소명', '평가', '새로운 단계'],
         meaning: '인생의 중대한 전환점입니다. 과거를 돌아보고, 진정한 소명을 향해 일어나세요.'
@@ -410,7 +410,7 @@ const TAROT_CARDS = {
       name: '세계',
       nameEn: 'The World',
       category: 'major',
-      image: 'images/cards/major/21-world.jpg',
+      image: 'images/cards/major/21-world.webp',
       upright: {
         keywords: ['완성', '성취', '통합', '여행', '목표 달성'],
         meaning: '하나의 사이클이 완성됩니다. 목표를 달성하고 온전한 성취감을 느끼는 축복의 시기입니다.'
@@ -470,7 +470,7 @@ function generateMinorSuit(suitId, suitKo, suitEn, element, theme) {
       name,
       nameEn,
       category: suitId,
-      image: `images/cards/minor/${suitId}-${String(i).padStart(2, '0')}.jpg`,
+      image: `images/cards/minor/${suitId}-${String(i).padStart(2, '0')}.webp`,
       upright: meaning.upright,
       reversed: meaning.reversed,
       symbols: meaning.symbols || `${suitKo} 수트의 ${element} 원소 에너지`,
